@@ -97,17 +97,17 @@
 
 ### Tests for User Story 5
 
-- [ ] T037 [P] [US5] Write integration test for driver registration endpoint (valid, missing vehicle_type) in `tests/integration/api/driver-register.test.ts`
-- [ ] T038 [P] [US5] Write integration test for driver status transitions (pending → available, pending → suspended) in `tests/integration/api/driver-status.test.ts`
+- [x] T037 [P] [US5] Write integration test for driver registration endpoint (valid, missing vehicle_type) in `tests/integration/api/driver-register.test.ts`
+- [x] T038 [P] [US5] Write integration test for driver status transitions (pending → available, pending → suspended) in `tests/integration/api/driver-status.test.ts`
 
 ### Implementation for User Story 5
 
-- [ ] T039 [US5] Create driver registration API route (`POST /api/auth/register/driver`) creating User (role=driver) + Driver record in `src/app/api/auth/register/driver/route.ts`
-- [ ] T040 [US5] Create driver profile/status API routes (`GET /api/drivers/me`, `PUT /api/drivers/me/location`) in `src/app/api/drivers/me/route.ts` and `src/app/api/drivers/me/location/route.ts`
-- [ ] T041 [P] [US5] Create driver registration page with personal details and vehicle type form in `src/app/(driver)/register/page.tsx`
-- [ ] T042 [P] [US5] Create driver login page in `src/app/(driver)/login/page.tsx`
-- [ ] T043 [US5] Create driver dashboard page with availability toggle and pending approval state in `src/app/(driver)/page.tsx`
-- [ ] T044 [US5] Create driver profile page showing status, rating, and vehicle info in `src/app/(driver)/profile/page.tsx`
+- [x] T039 [US5] Create driver registration API route (`POST /api/auth/register/driver`) creating User (role=driver) + Driver record in `src/app/api/auth/register/driver/route.ts`
+- [x] T040 [US5] Create driver profile/status API routes (`GET /api/drivers/me`, `PUT /api/drivers/me/location`) in `src/app/api/drivers/me/route.ts` and `src/app/api/drivers/me/location/route.ts`
+- [x] T041 [P] [US5] Create driver registration page with personal details and vehicle type form in `src/app/(driver)/driver/register/page.tsx`
+- [x] T042 [P] [US5] Create driver login page in `src/app/(driver)/driver/login/page.tsx`
+- [x] T043 [US5] Create driver dashboard page with availability toggle and pending approval state in `src/app/(driver)/driver/page.tsx`
+- [x] T044 [US5] Create driver profile page showing status, rating, and vehicle info in `src/app/(driver)/driver/profile/page.tsx`
 
 **Checkpoint**: Drivers can register and log in. Admin approval flow available (admin endpoint created in US3).
 
