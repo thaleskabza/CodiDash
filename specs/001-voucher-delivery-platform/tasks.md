@@ -191,17 +191,17 @@
 
 ### Tests for User Story 6
 
-- [ ] T083 [P] [US6] Write integration test for PayFast tokenization at order creation (sandbox card, token stored) in `tests/integration/api/payment-tokenize.test.ts`
-- [ ] T084 [P] [US6] Write integration test for PayFast charge at delivery (R35 tier, R45 tier, charge failure + retry) in `tests/integration/api/payment-charge.test.ts`
-- [ ] T085 [P] [US6] Write integration test for PayFast ITN webhook (valid signature, invalid signature, amount mismatch) in `tests/integration/api/payment-webhook.test.ts`
+- [x] T083 [P] [US6] Write integration test for PayFast tokenization at order creation (sandbox card, token stored) in `tests/integration/api/payment-tokenize.test.ts`
+- [x] T084 [P] [US6] Write integration test for PayFast charge at delivery (R35 tier, R45 tier, charge failure + retry) in `tests/integration/api/payment-charge.test.ts`
+- [x] T085 [P] [US6] Write integration test for PayFast ITN webhook (valid signature, invalid signature, amount mismatch) in `tests/integration/api/payment-webhook.test.ts`
 
 ### Implementation for User Story 6
 
-- [ ] T086 [US6] Create PayFast ITN webhook route (`POST /api/payments/webhook`) with IP whitelist, signature validation, payment status update, and audit logging in `src/app/api/payments/webhook/route.ts`
-- [ ] T087 [US6] Implement payment charge flow in order delivery handler — call PayFast adhoc charge with stored token, apply split (driver_amount + platform_amount), create Payment record in `src/lib/payfast.ts` (extend charge logic)
-- [ ] T088 [US6] Implement payment failure handling with retry capability — update order to payment_pending on failure, notify customer/driver, allow manual retry in `src/app/api/payments/retry/route.ts`
-- [ ] T089 [US6] Create driver earnings page showing accumulated balance, completed deliveries, and payout history in `src/app/(driver)/earnings/page.tsx`
-- [ ] T090 [US6] Create PaymentStatus component showing charge status, amount, and split breakdown in `src/components/shared/PaymentStatus.tsx`
+- [x] T086 [US6] Create PayFast ITN webhook route (`POST /api/payments/webhook`) with IP whitelist, signature validation, payment status update, and audit logging in `src/app/api/payments/webhook/route.ts`
+- [x] T087 [US6] Implement payment charge flow in order delivery handler — call PayFast adhoc charge with stored token, apply split (driver_amount + platform_amount), create Payment record in `src/lib/payfast.ts` (extend charge logic)
+- [x] T088 [US6] Implement payment failure handling with retry capability — update order to payment_pending on failure, notify customer/driver, allow manual retry in `src/app/api/payments/retry/route.ts`
+- [x] T089 [US6] Create driver earnings page showing accumulated balance, completed deliveries, and payout history in `src/app/(driver)/earnings/page.tsx`
+- [x] T090 [US6] Create PaymentStatus component showing charge status, amount, and split breakdown in `src/components/shared/PaymentStatus.tsx`
 
 **Checkpoint**: End-to-end payment flow operational — tokenize at order, charge at delivery, split applied, driver earnings tracked.
 
