@@ -70,18 +70,18 @@
 
 ### Tests for User Story 4
 
-- [ ] T028 [P] [US4] Write integration test for customer registration endpoint (valid, duplicate email, invalid input) in `tests/integration/api/auth-register.test.ts`
-- [ ] T029 [P] [US4] Write integration test for customer login endpoint (valid credentials, invalid password, unknown email) in `tests/integration/api/auth-login.test.ts`
-- [ ] T030 [P] [US4] Write integration test for delivery address CRUD in `tests/integration/api/addresses.test.ts`
+- [x] T028 [P] [US4] Write integration test for customer registration endpoint (valid, duplicate email, invalid input) in `tests/integration/api/auth-register.test.ts`
+- [x] T029 [P] [US4] Write integration test for customer login endpoint (valid credentials, invalid password, unknown email) in `tests/integration/api/auth-login.test.ts`
+- [x] T030 [P] [US4] Write integration test for delivery address CRUD in `tests/integration/api/addresses.test.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T031 [US4] Create customer registration API route (`POST /api/auth/register`) with email uniqueness check, password hashing (bcrypt), and role assignment in `src/app/api/auth/register/route.ts`
-- [ ] T032 [US4] Create delivery address API routes (`GET/POST /api/addresses`, `PATCH/DELETE /api/addresses/[id]`) with geocoding via Nominatim in `src/app/api/addresses/route.ts` and `src/app/api/addresses/[id]/route.ts`
-- [ ] T033 [P] [US4] Create customer registration page with name/email/password form and validation in `src/app/(customer)/register/page.tsx`
-- [ ] T034 [P] [US4] Create customer login page with email/password form in `src/app/(customer)/login/page.tsx`
-- [ ] T035 [US4] Create customer profile page with delivery address management (add, edit, delete, set default) in `src/app/(customer)/profile/page.tsx`
-- [ ] T036 [US4] Create AddressForm component with address input and geocoding feedback in `src/components/customer/AddressForm.tsx`
+- [x] T031 [US4] Create customer registration API route (`POST /api/auth/register`) with email uniqueness check, password hashing (bcrypt), and role assignment in `src/app/api/auth/register/route.ts`
+- [x] T032 [US4] Create delivery address API routes (`GET/POST /api/addresses`, `PATCH/DELETE /api/addresses/[id]`) with geocoding via Nominatim in `src/app/api/addresses/route.ts` and `src/app/api/addresses/[id]/route.ts`
+- [x] T033 [P] [US4] Create customer registration page with name/email/password form and validation in `src/app/(customer)/register/page.tsx`
+- [x] T034 [P] [US4] Create customer login page with email/password form in `src/app/(customer)/login/page.tsx`
+- [x] T035 [US4] Create customer profile page with delivery address management (add, edit, delete, set default) in `src/app/(customer)/profile/page.tsx`
+- [x] T036 [US4] Create AddressForm component with address input and geocoding feedback in `src/components/customer/AddressForm.tsx`
 
 **Checkpoint**: Customers can register, log in, and manage delivery addresses.
 
