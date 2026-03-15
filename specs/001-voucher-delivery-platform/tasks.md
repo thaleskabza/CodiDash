@@ -121,26 +121,26 @@
 
 ### Tests for User Story 1
 
-- [ ] T045 [P] [US1] Write integration test for order creation endpoint (valid single item, valid multi-item, voucher-item mismatch, address out of range) in `tests/integration/api/orders-create.test.ts`
-- [ ] T046 [P] [US1] Write integration test for QR code generation endpoint (valid order, expired QR, invalid signature) in `tests/integration/api/orders-qr.test.ts`
-- [ ] T047 [P] [US1] Write unit test for delivery fee calculation (0-4km=R35, 5-10km=R45, >10km=reject) in `tests/unit/lib/delivery-fee.test.ts`
+- [x] T045 [P] [US1] Write integration test for order creation endpoint (valid single item, valid multi-item, voucher-item mismatch, address out of range) in `tests/integration/api/orders-create.test.ts`
+- [x] T046 [P] [US1] Write integration test for QR code generation endpoint (valid order, expired QR, invalid signature) in `tests/integration/api/orders-qr.test.ts`
+- [x] T047 [P] [US1] Write unit test for delivery fee calculation (0-4km=R35, 5-10km=R45, >10km=reject) in `tests/unit/lib/delivery-fee.test.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T048 [US1] Create stores API route (`GET /api/stores`) returning active stores with coordinates in `src/app/api/stores/route.ts`
-- [ ] T049 [US1] Create menu items API route (`GET /api/menu`) returning available smoothie items in `src/app/api/menu/route.ts`
-- [ ] T050 [US1] Create order creation API route (`POST /api/orders`) with voucher-item 1:1 validation, distance calculation, fee determination, PayFast tokenization, QR generation, and OrderItem creation in `src/app/api/orders/route.ts`
-- [ ] T051 [US1] Create order detail API route (`GET /api/orders/[id]`) with items, payment status, and QR data in `src/app/api/orders/[id]/route.ts`
-- [ ] T052 [US1] Create order list API route (`GET /api/orders`) with status filtering and pagination (customer sees own orders) in `src/app/api/orders/route.ts` (GET handler)
-- [ ] T053 [US1] Create QR code generation/regeneration API route (`GET /api/orders/[id]/qr`) in `src/app/api/orders/[id]/qr/route.ts`
-- [ ] T054 [P] [US1] Create VoucherItemForm component (add/remove voucher-item pairs, 1:1 validation, image upload) in `src/components/customer/VoucherItemForm.tsx`
-- [ ] T055 [P] [US1] Create StoreSelector component (list active stores, show on map) in `src/components/customer/StoreSelector.tsx`
-- [ ] T056 [P] [US1] Create DeliveryFeeDisplay component (distance tier, fee amount, address validation feedback) in `src/components/customer/DeliveryFeeDisplay.tsx`
-- [ ] T057 [P] [US1] Create QRCodeDisplay component (render QR image, expiry countdown, regenerate button) in `src/components/customer/QRCodeDisplay.tsx`
-- [ ] T058 [US1] Create order creation page combining store selection, voucher-item form, address selection, fee display, and payment submission in `src/app/(customer)/page.tsx`
-- [ ] T059 [US1] Create order tracking page with real-time status updates via Supabase Realtime subscription and QR code display in `src/app/(customer)/orders/[id]/page.tsx`
-- [ ] T060 [US1] Create customer order history page with status filtering in `src/app/(customer)/orders/page.tsx`
-- [ ] T061 [US1] Set up Supabase Realtime subscription hook for order status changes in `src/lib/realtime.ts`
+- [x] T048 [US1] Create stores API route (`GET /api/stores`) returning active stores with coordinates in `src/app/api/stores/route.ts`
+- [x] T049 [US1] Create menu items API route (`GET /api/menu`) returning available smoothie items in `src/app/api/menu/route.ts`
+- [x] T050 [US1] Create order creation API route (`POST /api/orders`) with voucher-item 1:1 validation, distance calculation, fee determination, QR generation, and OrderItem creation in `src/app/api/orders/route.ts`
+- [x] T051 [US1] Create order detail API route (`GET /api/orders/[id]`) with items, payment status, and QR data in `src/app/api/orders/[id]/route.ts`
+- [x] T052 [US1] Create order list API route (`GET /api/orders`) with status filtering and pagination (customer sees own orders) in `src/app/api/orders/route.ts` (GET handler)
+- [x] T053 [US1] Create QR code generation/regeneration API route (`GET /api/orders/[id]/qr`) in `src/app/api/orders/[id]/qr/route.ts`
+- [x] T054 [P] [US1] Create VoucherItemForm component (add/remove voucher-item pairs, 1:1 validation, image upload) in `src/components/customer/VoucherItemForm.tsx`
+- [x] T055 [P] [US1] Create StoreSelector component (list active stores, show on map) in `src/components/customer/StoreSelector.tsx`
+- [x] T056 [P] [US1] Create DeliveryFeeDisplay component (distance tier, fee amount, address validation feedback) in `src/components/customer/DeliveryFeeDisplay.tsx`
+- [x] T057 [P] [US1] Create QRCodeDisplay component (render QR image, expiry countdown, regenerate button) in `src/components/customer/QRCodeDisplay.tsx`
+- [x] T058 [US1] Create order creation page combining store selection, voucher-item form, address selection, fee display, and payment submission in `src/app/(customer)/page.tsx`
+- [x] T059 [US1] Create order tracking page with real-time status updates via Supabase Realtime subscription and QR code display in `src/app/(customer)/orders/[id]/page.tsx`
+- [x] T060 [US1] Create customer order history page with status filtering in `src/app/(customer)/orders/page.tsx`
+- [x] T061 [US1] Set up Supabase Realtime subscription hook for order status changes in `src/lib/realtime.ts`
 
 **Checkpoint**: Customer can place orders with vouchers, see tiered delivery fees, view QR codes, and track order status in real time. This is the MVP.
 
