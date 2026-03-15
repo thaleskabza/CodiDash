@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/Card";
 import { Alert } from "@/components/ui/Alert";
+import { DriverDashboardClient } from "@/components/driver/DriverDashboardClient";
 
 const STATUS_LABELS: Record<string, string> = {
   pending_approval: "Pending Approval",
@@ -38,7 +39,7 @@ export default async function DriverDashboardPage() {
     <div className="max-w-xl mx-auto py-8 px-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">
-          Hello, {driver.user.name.split(" ")[0]} 👋
+          Hello, {driver.user.name.split(" ")[0]}
         </h1>
         <span className={`text-sm px-3 py-1 rounded-full font-medium ${statusColor}`}>
           {statusLabel}
@@ -47,8 +48,8 @@ export default async function DriverDashboardPage() {
 
       {driver.status === "pending_approval" && (
         <Alert variant="warning">
-          Your account is pending admin approval. You&apos;ll be notified when
-          you can start accepting orders.
+          Your account is pending admin approval. You&apos;ll be notified when you can start
+          accepting orders.
         </Alert>
       )}
 
@@ -60,21 +61,23 @@ export default async function DriverDashboardPage() {
 
       {(driver.status === "available" || driver.status === "offline") && (
         <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-2">Available Orders</h2>
-          <p className="text-gray-500 text-sm">
-            No orders available in your area right now. Make sure you&apos;re
-            online and within the delivery zone.
-          </p>
-          {/* Real-time order list will be added in Phase 6 (US2) */}
+          <h2 className="text-lg font-semibold mb-4">Available Orders</h2>
+          <DriverDashboardClient driverId={driver.id} />
         </Card>
       )}
 
       {driver.status === "busy" && (
         <Card className="p-6">
           <h2 className="text-lg font-semibold mb-2">Active Order</h2>
-          <p className="text-gray-500 text-sm">
-            You have an active order. Go to the Active Order tab to continue.
+          <p className="text-gray-500 text-sm mb-3">
+            You have an active order in progress.
           </p>
+          <a
+            href="/driver/orders/active"
+            className="text-sm font-medium text-green-600 underline"
+          >
+            View active order
+          </a>
         </Card>
       )}
 

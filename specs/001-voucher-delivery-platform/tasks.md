@@ -154,30 +154,30 @@
 
 ### Tests for User Story 2
 
-- [ ] T062 [P] [US2] Write integration test for order accept endpoint (first claim wins, already claimed conflict, driver not available) in `tests/integration/api/orders-accept.test.ts`
-- [ ] T063 [P] [US2] Write integration test for pickup confirmation endpoint (valid GPS + receipt, GPS mismatch rejection) in `tests/integration/api/orders-pickup.test.ts`
-- [ ] T064 [P] [US2] Write integration test for QR scan/delivery endpoint (valid scan, expired QR, invalid signature) in `tests/integration/api/orders-deliver.test.ts`
-- [ ] T065 [P] [US2] Write integration test for voucher invalid/replacement flow (report invalid, replace within 5 min, countdown expiry) in `tests/integration/api/voucher-replacement.test.ts`
+- [x] T062 [P] [US2] Write integration test for order accept endpoint (first claim wins, already claimed conflict, driver not available) in `tests/integration/api/orders-accept.test.ts`
+- [x] T063 [P] [US2] Write integration test for pickup confirmation endpoint (valid GPS + receipt, GPS mismatch rejection) in `tests/integration/api/orders-pickup.test.ts`
+- [x] T064 [P] [US2] Write integration test for QR scan/delivery endpoint (valid scan, expired QR, invalid signature) in `tests/integration/api/orders-deliver.test.ts`
+- [x] T065 [P] [US2] Write integration test for voucher invalid/replacement flow (report invalid, replace within 5 min, countdown expiry) in `tests/integration/api/voucher-replacement.test.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T066 [US2] Create dispatch broadcast API route (`POST /api/dispatch/broadcast`) implementing tiered radius logic (2-3km ideal, expand to 3-4km) in `src/app/api/dispatch/route.ts`
-- [ ] T067 [US2] Create order accept API route (`POST /api/orders/[id]/accept`) with atomic claim (first-come-first-served) and driver status update in `src/app/api/orders/[id]/accept/route.ts`
-- [ ] T068 [US2] Create order status update API route (`PATCH /api/orders/[id]`) with pickup confirmation (receipt photo + GPS verification within 200m) and in_transit transition in `src/app/api/orders/[id]/route.ts` (PATCH handler)
-- [ ] T069 [US2] Create QR scan/delivery API route (`POST /api/orders/[id]/qr/scan`) verifying HMAC signature, checking expiry, triggering PayFast charge, applying payment split, and updating order to delivered in `src/app/api/orders/[id]/qr/scan/route.ts`
-- [ ] T070 [US2] Create order cancel API route (`POST /api/orders/[id]/cancel`) handling driver voluntary cancellation (increment cancellation_count, re-broadcast) and customer cancellation in `src/app/api/orders/[id]/cancel/route.ts`
-- [ ] T071 [US2] Create voucher status update API route (`PATCH /api/orders/[id]/items/[itemId]/voucher-status`) for driver to report invalid voucher, triggering 5-min countdown in `src/app/api/orders/[id]/items/[itemId]/voucher-status/route.ts`
-- [ ] T072 [US2] Create voucher replacement API route (`PUT /api/orders/[id]/items/[itemId]/replace-voucher`) for customer to submit replacement within deadline in `src/app/api/orders/[id]/items/[itemId]/replace-voucher/route.ts`
-- [ ] T073 [US2] Implement voucher replacement countdown expiry handler (scheduled check or Supabase database function) that cancels unreplaced items and charges cancellation fee in `src/lib/voucher-expiry.ts`
-- [ ] T074 [P] [US2] Create DriverOrderCard component (order details, store info, voucher codes, accept button) in `src/components/driver/DriverOrderCard.tsx`
-- [ ] T075 [P] [US2] Create PickupConfirmation component (receipt photo upload, GPS status indicator, confirm button) in `src/components/driver/PickupConfirmation.tsx`
-- [ ] T076 [P] [US2] Create QRScanner component (camera access, QR decode, scan submission) in `src/components/driver/QRScanner.tsx`
-- [ ] T077 [P] [US2] Create VoucherInvalidReport component (mark voucher invalid, see replacement countdown) in `src/components/driver/VoucherInvalidReport.tsx`
-- [ ] T078 [US2] Create driver available orders page with Supabase Realtime broadcast subscription for nearby orders in `src/app/(driver)/page.tsx` (update from US5)
-- [ ] T079 [US2] Create driver active order page with pickup confirmation, navigation link, QR scanner, and voucher status management in `src/app/(driver)/orders/[id]/page.tsx`
-- [ ] T080 [US2] Set up Supabase Realtime broadcast channel for driver order notifications in `src/lib/realtime.ts` (extend from US1)
-- [ ] T081 [US2] Set up Supabase Realtime channel for voucher replacement events (invalid, replaced, expired) in `src/lib/realtime.ts` (extend)
-- [ ] T082 [US2] Create customer-side voucher replacement UI (notification, countdown timer, replacement form) in `src/components/customer/VoucherReplacement.tsx`
+- [x] T066 [US2] Create dispatch broadcast API route (`POST /api/dispatch/broadcast`) implementing tiered radius logic (2-3km ideal, expand to 3-4km) in `src/app/api/dispatch/route.ts`
+- [x] T067 [US2] Create order accept API route (`POST /api/orders/[id]/accept`) with atomic claim (first-come-first-served) and driver status update in `src/app/api/orders/[id]/accept/route.ts`
+- [x] T068 [US2] Create order status update API route (`PATCH /api/orders/[id]`) with pickup confirmation (receipt photo + GPS verification within 200m) and in_transit transition in `src/app/api/orders/[id]/route.ts` (PATCH handler)
+- [x] T069 [US2] Create QR scan/delivery API route (`POST /api/orders/[id]/qr/scan`) verifying HMAC signature, checking expiry, triggering PayFast charge, applying payment split, and updating order to delivered in `src/app/api/orders/[id]/qr/scan/route.ts`
+- [x] T070 [US2] Create order cancel API route (`POST /api/orders/[id]/cancel`) handling driver voluntary cancellation (increment cancellation_count, re-broadcast) and customer cancellation in `src/app/api/orders/[id]/cancel/route.ts`
+- [x] T071 [US2] Create voucher status update API route (`PATCH /api/orders/[id]/items/[itemId]/voucher-status`) for driver to report invalid voucher, triggering 5-min countdown in `src/app/api/orders/[id]/items/[itemId]/voucher-status/route.ts`
+- [x] T072 [US2] Create voucher replacement API route (`PUT /api/orders/[id]/items/[itemId]/replace-voucher`) for customer to submit replacement within deadline in `src/app/api/orders/[id]/items/[itemId]/replace-voucher/route.ts`
+- [x] T073 [US2] Implement voucher replacement countdown expiry handler (scheduled check or Supabase database function) that cancels unreplaced items and charges cancellation fee in `src/lib/voucher-expiry.ts`
+- [x] T074 [P] [US2] Create DriverOrderCard component (order details, store info, voucher codes, accept button) in `src/components/driver/DriverOrderCard.tsx`
+- [x] T075 [P] [US2] Create PickupConfirmation component (receipt photo upload, GPS status indicator, confirm button) in `src/components/driver/PickupConfirmation.tsx`
+- [x] T076 [P] [US2] Create QRScanner component (camera access, QR decode, scan submission) in `src/components/driver/QRScanner.tsx`
+- [x] T077 [P] [US2] Create VoucherInvalidReport component (mark voucher invalid, see replacement countdown) in `src/components/driver/VoucherInvalidReport.tsx`
+- [x] T078 [US2] Create driver available orders page with Supabase Realtime broadcast subscription for nearby orders in `src/app/(driver)/page.tsx` (update from US5)
+- [x] T079 [US2] Create driver active order page with pickup confirmation, navigation link, QR scanner, and voucher status management in `src/app/(driver)/orders/[id]/page.tsx`
+- [x] T080 [US2] Set up Supabase Realtime broadcast channel for driver order notifications in `src/lib/realtime.ts` (extend from US1)
+- [x] T081 [US2] Set up Supabase Realtime channel for voucher replacement events (invalid, replaced, expired) in `src/lib/realtime.ts` (extend)
+- [x] T082 [US2] Create customer-side voucher replacement UI (notification, countdown timer, replacement form) in `src/components/customer/VoucherReplacement.tsx`
 
 **Checkpoint**: Full driver workflow operational — broadcast, accept, pickup with GPS/receipt, QR scan delivery, invalid voucher handling. Combined with US1, the core order-to-delivery flow is complete.
 
