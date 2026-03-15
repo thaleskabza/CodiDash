@@ -1,0 +1,224 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  customer
+  driver
+  admin
+}
+
+enum DriverStatus {
+  pending_approval
+  available
+  busy
+  offline
+  suspended
+}
+
+enum OrderStatus {
+  pending_driver
+  driver_assigned
+  pickup_confirmed
+  in_transit
+  delivered
+  cancelled
+  payment_pending
+}
+
+enum VoucherStatus {
+  pending
+  valid
+  invalid
+  replaced
+  cancelled
+}
+
+enum PaymentStatus {
+  pending
+  authorized
+  captured
+  failed
+  refunded
+}
+
+enum ActorType {
+  customer
+  driver
+  admin
+  system
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  role          Role
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  driver            Driver?
+  orders            Order[]           @relation("CustomerOrders")
+  deliveryAddresses DeliveryAddress[]
+  auditLogs         OrderAudit[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Driver {
+  id                String       @id @default(uuid())
+  userId            String       @unique @map("user_id")
+  vehicleType       String       @map("vehicle_type")
+  status            DriverStatus @default(pending_approval)
+  rating            Decimal      @default(5.00) @db.Decimal(3, 2)
+  cancellationCount Int          @default(0) @map("cancellation_count")
+  latitude          Decimal?     @db.Decimal(10, 8)
+  longitude         Decimal?     @db.Decimal(11, 8)
+  locationUpdatedAt DateTime?    @map("location_updated_at")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+
+  user   User    @relation(fields: [userId], references: [id])
+  orders Order[] @relation("DriverOrders")
+
+  @@index([status])
+  @@index([userId])
+  @@map("drivers")
+}
+
+model Store {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  address   String
+  latitude  Decimal  @db.Decimal(10, 8)
+  longitude Decimal  @db.Decimal(11, 8)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  orders Order[]
+
+  @@index([isActive])
+  @@map("stores")
+}
+
+model DeliveryAddress {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  label     String?
+  address   String
+  latitude  Decimal  @db.Decimal(10, 8)
+  longitude Decimal  @db.Decimal(11, 8)
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user   User    @relation(fields: [userId], references: [id])
+  orders Order[]
+
+  @@index([userId])
+  @@map("delivery_addresses")
+}
+
+model Order {
+  id                String      @id @default(uuid())
+  orderNumber       String      @unique @map("order_number")
+  customerId        String      @map("customer_id")
+  storeId           String      @map("store_id")
+  driverId          String?     @map("driver_id")
+  deliveryAddressId String      @map("delivery_address_id")
+  status            OrderStatus @default(pending_driver)
+  distanceKm        Decimal     @map("distance_km") @db.Decimal(5, 2)
+  deliveryFee       Int         @map("delivery_fee")
+  qrPayload         String?     @map("qr_payload")
+  qrExpiresAt       DateTime?   @map("qr_expires_at")
+  paymentToken      String?     @map("payment_token")
+  cancelledReason   String?     @map("cancelled_reason")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  customer        User            @relation("CustomerOrders", fields: [customerId], references: [id])
+  store           Store           @relation(fields: [storeId], references: [id])
+  driver          Driver?         @relation("DriverOrders", fields: [driverId], references: [id])
+  deliveryAddress DeliveryAddress @relation(fields: [deliveryAddressId], references: [id])
+  items           OrderItem[]
+  payment         Payment?
+  auditLogs       OrderAudit[]
+
+  @@index([customerId])
+  @@index([driverId])
+  @@index([status])
+  @@index([storeId])
+  @@index([orderNumber])
+  @@map("orders")
+}
+
+model OrderItem {
+  id                  String        @id @default(uuid())
+  orderId             String        @map("order_id")
+  voucherCode         String?       @map("voucher_code")
+  voucherImageUrl     String?       @map("voucher_image_url")
+  smoothieItem        String        @map("smoothie_item")
+  voucherStatus       VoucherStatus @default(pending) @map("voucher_status")
+  replacementDeadline DateTime?     @map("replacement_deadline")
+  createdAt           DateTime      @default(now()) @map("created_at")
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model Payment {
+  id               String        @id @default(uuid())
+  orderId          String        @unique @map("order_id")
+  amount           Int
+  driverAmount     Int           @map("driver_amount")
+  platformAmount   Int           @map("platform_amount")
+  status           PaymentStatus @default(pending)
+  payfastToken     String?       @map("payfast_token")
+  payfastPaymentId String?       @map("payfast_payment_id")
+  failureReason    String?       @map("failure_reason")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@index([orderId])
+  @@index([status])
+  @@map("payments")
+}
+
+model OrderAudit {
+  id             String    @id @default(uuid())
+  orderId        String    @map("order_id")
+  previousStatus String?   @map("previous_status")
+  newStatus      String    @map("new_status")
+  actorId        String?   @map("actor_id")
+  actorType      ActorType @map("actor_type")
+  metadata       Json?
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  order Order  @relation(fields: [orderId], references: [id])
+  actor User?  @relation(fields: [actorId], references: [id])
+
+  @@index([orderId])
+  @@map("order_audits")
+}
+
+model MenuItem {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  category    String?
+  isAvailable Boolean  @default(true) @map("is_available")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("menu_items")
+}
