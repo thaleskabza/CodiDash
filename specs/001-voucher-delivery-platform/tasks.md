@@ -19,15 +19,15 @@
 
 **Purpose**: Project initialization, dependency installation, and basic configuration
 
-- [ ] T001 Initialize Next.js 14 project with TypeScript and App Router in repository root (`npx create-next-app@14 . --typescript --app --src-dir`)
-- [ ] T002 Install core dependencies: `@supabase/supabase-js`, `prisma`, `@prisma/client`, `next-auth@beta`, `bcrypt`, `qrcode`, `@turf/distance`, `@turf/helpers`, `zod`
-- [ ] T003 Install dev dependencies: `jest`, `@testing-library/react`, `@testing-library/jest-dom`, `playwright`, `@types/bcrypt`, `@types/qrcode`, `supertest`, `ts-jest`
-- [ ] T004 [P] Create `.env.example` with all required environment variables (DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL, SUPABASE keys, PAYFAST credentials, QR_SECRET, NOMINATIM_USER_AGENT)
-- [ ] T005 [P] Configure ESLint and Prettier with Next.js recommended rules in `eslint.config.mjs` and `.prettierrc`
-- [ ] T006 [P] Configure Jest for unit/integration tests in `jest.config.ts` with path aliases and TypeScript support
-- [ ] T007 [P] Configure Playwright for E2E tests in `playwright.config.ts` with base URL and project definitions for customer/driver/admin portals
-- [ ] T008 [P] Create GitHub Actions CI workflow in `.github/workflows/ci.yml` (lint, test, build on PR)
-- [ ] T009 Create root layout with providers in `src/app/layout.tsx` and global styles in `src/app/globals.css`
+- [x] T001 Initialize Next.js 14 project with TypeScript and App Router in repository root (`npx create-next-app@14 . --typescript --app --src-dir`)
+- [x] T002 Install core dependencies: `@supabase/supabase-js`, `prisma`, `@prisma/client`, `next-auth@beta`, `bcrypt`, `qrcode`, `@turf/distance`, `@turf/helpers`, `zod`
+- [x] T003 Install dev dependencies: `jest`, `@testing-library/react`, `@testing-library/jest-dom`, `playwright`, `@types/bcrypt`, `@types/qrcode`, `supertest`, `ts-jest`
+- [x] T004 [P] Create `.env.example` with all required environment variables (DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL, SUPABASE keys, PAYFAST credentials, QR_SECRET, NOMINATIM_USER_AGENT)
+- [x] T005 [P] Configure ESLint and Prettier with Next.js recommended rules in `eslint.config.mjs` and `.prettierrc`
+- [x] T006 [P] Configure Jest for unit/integration tests in `jest.config.ts` with path aliases and TypeScript support
+- [x] T007 [P] Configure Playwright for E2E tests in `playwright.config.ts` with base URL and project definitions for customer/driver/admin portals
+- [x] T008 [P] Create GitHub Actions CI workflow in `.github/workflows/ci.yml` (lint, test, build on PR)
+- [x] T009 Create root layout with providers in `src/app/layout.tsx` and global styles in `src/app/globals.css`
 
 ---
 
@@ -37,24 +37,24 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T010 Create Prisma schema with all entities (User, Driver, Store, DeliveryAddress, Order, OrderItem, Payment, OrderAudit, MenuItem) including enums, relations, and indexes in `prisma/schema.prisma`
-- [ ] T011 Run initial Prisma migration and generate client (`npx prisma migrate dev --name init`)
-- [ ] T012 Create seed script with 5 Cape Town Kauai stores, sample menu items, and 1 admin user in `prisma/seed.ts`
-- [ ] T013 [P] Create Supabase client singleton in `src/lib/db.ts` (server-side service role client + browser anon client)
-- [ ] T014 [P] Create Prisma client singleton with connection pooling in `src/lib/prisma.ts`
-- [ ] T015 Configure NextAuth.js v5 with credentials provider, JWT strategy, bcrypt password verification, and role injection in session/JWT callbacks in `src/lib/auth.ts` and `src/app/api/auth/[...nextauth]/route.ts`
-- [ ] T016 Implement auth + role-based route protection middleware in `src/middleware.ts` (customer routes require role=customer, driver routes require role=driver, admin routes require role=admin)
-- [ ] T017 [P] Implement geo distance utility using @turf/distance (calculateDistance, getDeliveryTier, findNearestStore) in `src/lib/geo.ts`
-- [ ] T018 [P] Implement QR code generation and HMAC-SHA256 signing/verification (generateQR, signPayload, verifySignature) in `src/lib/qr.ts`
-- [ ] T019 [P] Implement PayFast integration utilities (createToken, chargeToken, verifyITN, validateSignature) in `src/lib/payfast.ts`
-- [ ] T020 [P] Create shared TypeScript types and Zod validation schemas for all entities in `src/types/index.ts`
-- [ ] T021 [P] Create shared error handling utilities (AppError class, error response formatter) in `src/lib/errors.ts`
-- [ ] T022 [P] Create shared UI components (Button, Input, Card, Alert, Loading) in `src/components/ui/`
-- [ ] T023 [P] Implement file upload utility for Supabase Storage (voucher images, receipt photos) in `src/lib/uploads.ts`
-- [ ] T024 Create file upload API route (`POST /api/uploads`) with size/type validation in `src/app/api/uploads/route.ts`
-- [ ] T025 Write unit tests for geo utility (distance calc, tier determination, edge cases) in `tests/unit/lib/geo.test.ts`
-- [ ] T026 [P] Write unit tests for QR utility (sign, verify, expiry, tamper detection) in `tests/unit/lib/qr.test.ts`
-- [ ] T027 [P] Write unit tests for PayFast utility (signature validation, ITN verification) in `tests/unit/lib/payfast.test.ts`
+- [x] T010 Create Prisma schema with all entities (User, Driver, Store, DeliveryAddress, Order, OrderItem, Payment, OrderAudit, MenuItem) including enums, relations, and indexes in `prisma/schema.prisma`
+- [x] T011 Run initial Prisma migration and generate client (`npx prisma migrate dev --name init`)
+- [x] T012 Create seed script with 5 Cape Town Kauai stores, sample menu items, and 1 admin user in `prisma/seed.ts`
+- [x] T013 [P] Create Supabase client singleton in `src/lib/db.ts` (server-side service role client + browser anon client)
+- [x] T014 [P] Create Prisma client singleton with connection pooling in `src/lib/prisma.ts`
+- [x] T015 Configure NextAuth.js v5 with credentials provider, JWT strategy, bcrypt password verification, and role injection in session/JWT callbacks in `src/lib/auth.ts` and `src/app/api/auth/[...nextauth]/route.ts`
+- [x] T016 Implement auth + role-based route protection middleware in `src/middleware.ts` (customer routes require role=customer, driver routes require role=driver, admin routes require role=admin)
+- [x] T017 [P] Implement geo distance utility using @turf/distance (calculateDistance, getDeliveryTier, findNearestStore) in `src/lib/geo.ts`
+- [x] T018 [P] Implement QR code generation and HMAC-SHA256 signing/verification (generateQR, signPayload, verifySignature) in `src/lib/qr.ts`
+- [x] T019 [P] Implement PayFast integration utilities (createToken, chargeToken, verifyITN, validateSignature) in `src/lib/payfast.ts`
+- [x] T020 [P] Create shared TypeScript types and Zod validation schemas for all entities in `src/types/index.ts`
+- [x] T021 [P] Create shared error handling utilities (AppError class, error response formatter) in `src/lib/errors.ts`
+- [x] T022 [P] Create shared UI components (Button, Input, Card, Alert, Loading) in `src/components/ui/`
+- [x] T023 [P] Implement file upload utility for Supabase Storage (voucher images, receipt photos) in `src/lib/uploads.ts`
+- [x] T024 Create file upload API route (`POST /api/uploads`) with size/type validation in `src/app/api/uploads/route.ts`
+- [x] T025 Write unit tests for geo utility (distance calc, tier determination, edge cases) in `tests/unit/lib/geo.test.ts`
+- [x] T026 [P] Write unit tests for QR utility (sign, verify, expiry, tamper detection) in `tests/unit/lib/qr.test.ts`
+- [x] T027 [P] Write unit tests for PayFast utility (signature validation, ITN verification) in `tests/unit/lib/payfast.test.ts`
 
 **Checkpoint**: Foundation ready — all shared infrastructure in place. User story implementation can now begin.
 
