@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
       include: {
         store: { select: { name: true } },
         driver: { include: { user: { select: { name: true } } } },
-        payment: { select: { status: true, amountCharged: true } },
+        payment: { select: { status: true, amount: true } },
         _count: { select: { items: true } },
       },
       orderBy: { createdAt: "desc" },
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
   ]);
 
   return NextResponse.json({
-    data: orders.map((o) => ({
+    data: orders.map((o: typeof orders[number]) => ({
       id: o.id,
       orderNumber: o.orderNumber,
       status: o.status,
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
       itemCount: o._count.items,
       deliveryFee: o.deliveryFee,
       paymentStatus: o.payment?.status ?? null,
-      amountCharged: o.payment?.amountCharged ?? null,
+      amountCharged: o.payment?.amount ?? null,
       createdAt: o.createdAt.toISOString(),
     })),
     total,

@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
       if (token) {
         await prisma.order.update({
           where: { id: orderId },
-          data: { payfastToken: token },
+          data: { paymentToken: token },
         });
       }
 
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
         await prisma.payment.update({
           where: { id: order.payment.id },
           data: {
-            status: "completed",
+            status: "captured",
             payfastPaymentId,
           },
         });

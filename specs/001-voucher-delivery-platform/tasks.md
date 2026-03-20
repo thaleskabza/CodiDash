@@ -215,26 +215,26 @@
 
 ### Tests for User Story 3
 
-- [ ] T091 [P] [US3] Write integration test for admin order listing endpoint (filter by status, date range, pagination) in `tests/integration/api/admin-orders.test.ts`
-- [ ] T092 [P] [US3] Write integration test for admin driver management endpoint (approve, suspend, list with status filter) in `tests/integration/api/admin-drivers.test.ts`
-- [ ] T093 [P] [US3] Write integration test for revenue tracking endpoint (date range, totals, splits) in `tests/integration/api/admin-revenue.test.ts`
+- [x] T091 [P] [US3] Write integration test for admin order listing endpoint (filter by status, date range, pagination) in `tests/integration/api/admin-orders.test.ts`
+- [x] T092 [P] [US3] Write integration test for admin driver management endpoint (approve, suspend, list with status filter) in `tests/integration/api/admin-drivers.test.ts`
+- [x] T093 [P] [US3] Write integration test for revenue tracking endpoint (date range, totals, splits) in `tests/integration/api/admin-revenue.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T094 [US3] Create admin order listing API route (`GET /api/admin/orders`) with status/date/store/driver filtering and pagination in `src/app/api/admin/orders/route.ts`
-- [ ] T095 [US3] Create admin driver management API routes (`GET /api/admin/drivers`, `PATCH /api/admin/drivers/[id]`) for listing, approving, suspending in `src/app/api/admin/drivers/route.ts` and `src/app/api/admin/drivers/[id]/route.ts`
-- [ ] T096 [US3] Create admin revenue tracking API route (`GET /api/admin/revenue`) with date range aggregation (total, driver payouts, platform earnings, order counts) in `src/app/api/admin/revenue/route.ts`
-- [ ] T097 [US3] Create admin fraud detection API route (`GET /api/admin/fraud`) returning orders flagged for missing receipts, GPS mismatches, expired QR anomalies in `src/app/api/admin/fraud/route.ts`
-- [ ] T098 [P] [US3] Create OrderTable component with sortable columns, status badges, and row click for details in `src/components/admin/OrderTable.tsx`
-- [ ] T099 [P] [US3] Create DriverTable component with status badges, approve/suspend actions, and cancellation count display in `src/components/admin/DriverTable.tsx`
-- [ ] T100 [P] [US3] Create RevenueChart component with date range selector and summary cards (total, driver payouts, platform earnings) in `src/components/admin/RevenueChart.tsx`
-- [ ] T101 [P] [US3] Create FraudAlerts component showing flagged orders with anomaly type indicators in `src/components/admin/FraudAlerts.tsx`
-- [ ] T102 [US3] Create admin dashboard page with overview cards (active orders, online drivers, today's revenue, fraud alerts count) in `src/app/(admin)/page.tsx`
-- [ ] T103 [US3] Create admin order monitoring page with OrderTable and status filters in `src/app/(admin)/orders/page.tsx`
-- [ ] T104 [US3] Create admin driver management page with DriverTable and approval workflow in `src/app/(admin)/drivers/page.tsx`
-- [ ] T105 [US3] Create admin revenue tracking page with RevenueChart and date range filters in `src/app/(admin)/revenue/page.tsx`
-- [ ] T106 [US3] Create admin fraud detection page with FraudAlerts listing in `src/app/(admin)/fraud/page.tsx`
-- [ ] T107 [US3] Create admin layout with sidebar navigation (Dashboard, Orders, Drivers, Revenue, Fraud) in `src/app/(admin)/layout.tsx`
+- [x] T094 [US3] Create admin order listing API route (`GET /api/admin/orders`) with status/date/store/driver filtering and pagination in `src/app/api/admin/orders/route.ts`
+- [x] T095 [US3] Create admin driver management API routes (`GET /api/admin/drivers`, `PATCH /api/admin/drivers/[id]`) for listing, approving, suspending in `src/app/api/admin/drivers/route.ts` and `src/app/api/admin/drivers/[id]/route.ts`
+- [x] T096 [US3] Create admin revenue tracking API route (`GET /api/admin/revenue`) with date range aggregation (total, driver payouts, platform earnings, order counts) in `src/app/api/admin/revenue/route.ts`
+- [x] T097 [US3] Create admin fraud detection API route (`GET /api/admin/fraud`) returning orders flagged for missing receipts, GPS mismatches, expired QR anomalies in `src/app/api/admin/fraud/route.ts`
+- [x] T098 [P] [US3] Create OrderTable component with sortable columns, status badges, and row click for details in `src/components/admin/OrderTable.tsx`
+- [x] T099 [P] [US3] Create DriverTable component with status badges, approve/suspend actions, and cancellation count display in `src/components/admin/DriverTable.tsx`
+- [x] T100 [P] [US3] Create RevenueChart component with date range selector and summary cards (total, driver payouts, platform earnings) in `src/components/admin/RevenueChart.tsx`
+- [x] T101 [P] [US3] Create FraudAlerts component showing flagged orders with anomaly type indicators in `src/components/admin/FraudAlerts.tsx`
+- [x] T102 [US3] Create admin dashboard page with overview cards (active orders, online drivers, today's revenue, fraud alerts count) in `src/app/(admin)/page.tsx`
+- [x] T103 [US3] Create admin order monitoring page with OrderTable and status filters in `src/app/(admin)/orders/page.tsx`
+- [x] T104 [US3] Create admin driver management page with DriverTable and approval workflow in `src/app/(admin)/drivers/page.tsx`
+- [x] T105 [US3] Create admin revenue tracking page with RevenueChart and date range filters in `src/app/(admin)/revenue/page.tsx`
+- [x] T106 [US3] Create admin fraud detection page with FraudAlerts listing in `src/app/(admin)/fraud/page.tsx`
+- [x] T107 [US3] Create admin layout with sidebar navigation (Dashboard, Orders, Drivers, Revenue, Fraud) in `src/app/(admin)/layout.tsx`
 
 **Checkpoint**: Admin portal fully operational — orders, drivers, revenue, and fraud monitoring all accessible.
 
@@ -244,18 +244,18 @@
 
 **Purpose**: Improvements affecting multiple user stories, hardening, and deployment readiness
 
-- [ ] T108 Implement automatic order cancellation after 30-minute driver timeout (configurable) via scheduled function or Supabase cron in `src/lib/order-timeout.ts`
-- [ ] T109 Implement automatic order reassignment after 90-minute pickup timeout in `src/lib/order-timeout.ts` (extend)
-- [ ] T110 [P] Add OrderAudit trail logging to all order status change handlers (create audit record with actor, previous/new status, metadata) in `src/lib/audit.ts`
-- [ ] T111 [P] Add Sentry error tracking integration in `src/lib/sentry.ts` and `next.config.js`
-- [ ] T112 [P] Create customer layout with navigation (Home, Orders, Profile) in `src/app/(customer)/layout.tsx`
-- [ ] T113 [P] Create driver layout with mobile-optimised navigation (Dashboard, Active Order, Earnings, Profile) in `src/app/(driver)/layout.tsx`
-- [ ] T114 Configure Vercel deployment settings in `vercel.json` (environment variables, build config)
-- [ ] T115 Write E2E test for complete customer order flow (register → login → create order → view tracking → QR display) in `tests/e2e/customer/order-flow.spec.ts`
-- [ ] T116 [P] Write E2E test for complete driver fulfillment flow (register → login → accept → pickup → deliver) in `tests/e2e/driver/fulfillment-flow.spec.ts`
-- [ ] T117 [P] Write E2E test for admin monitoring flow (login → view orders → approve driver → view revenue) in `tests/e2e/admin/monitoring-flow.spec.ts`
-- [ ] T118 Run quickstart.md validation — verify all setup steps work on a clean clone
-- [ ] T119 Security review: verify no secrets in code, all env vars documented, RBAC enforced on all routes, HMAC secrets rotatable
+- [x] T108 Implement automatic order cancellation after 30-minute driver timeout (configurable) via scheduled function or Supabase cron in `src/lib/order-timeout.ts`
+- [x] T109 Implement automatic order reassignment after 90-minute pickup timeout in `src/lib/order-timeout.ts` (extend)
+- [x] T110 [P] Add OrderAudit trail logging to all order status change handlers (create audit record with actor, previous/new status, metadata) in `src/lib/audit.ts`
+- [x] T111 [P] Add Sentry error tracking integration in `src/lib/sentry.ts` and `next.config.js`
+- [x] T112 [P] Create customer layout with navigation (Home, Orders, Profile) in `src/app/(customer)/layout.tsx`
+- [x] T113 [P] Create driver layout with mobile-optimised navigation (Dashboard, Active Order, Earnings, Profile) in `src/app/(driver)/layout.tsx`
+- [x] T114 Configure Vercel deployment settings in `vercel.json` (environment variables, build config)
+- [x] T115 Write E2E test for complete customer order flow (register → login → create order → view tracking → QR display) in `tests/e2e/customer/order-flow.spec.ts`
+- [x] T116 [P] Write E2E test for complete driver fulfillment flow (register → login → accept → pickup → deliver) in `tests/e2e/driver/fulfillment-flow.spec.ts`
+- [x] T117 [P] Write E2E test for admin monitoring flow (login → view orders → approve driver → view revenue) in `tests/e2e/admin/monitoring-flow.spec.ts`
+- [x] T118 Run quickstart.md validation — verify all setup steps work on a clean clone
+- [x] T119 Security review: verify no secrets in code, all env vars documented, RBAC enforced on all routes, HMAC secrets rotatable
 
 ---
 

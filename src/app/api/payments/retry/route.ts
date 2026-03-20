@@ -42,12 +42,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!order.payfastToken) {
+  if (!order.paymentToken) {
     return NextResponse.json({ error: "No payment token stored for this order" }, { status: 422 });
   }
 
   const chargeParams: PayFastChargeParams = {
-    token: order.payfastToken,
+    token: order.paymentToken,
     amount: order.deliveryFee,
     orderId: order.id,
     itemName: `CodiDash Delivery - Order ${order.orderNumber}`,
@@ -73,9 +73,9 @@ export async function POST(req: NextRequest) {
       await tx.payment.update({
         where: { id: order.payment.id },
         data: {
-          status: "completed",
+          status: "captured",
           payfastPaymentId: chargeResult.payfastPaymentId,
-          amountCharged: order.deliveryFee,
+          amount: order.deliveryFee,
           driverAmount: split.driverAmount,
           platformAmount: split.platformAmount,
         },
@@ -84,9 +84,9 @@ export async function POST(req: NextRequest) {
       await tx.payment.create({
         data: {
           orderId: order.id,
-          status: "completed",
+          status: "captured",
           payfastPaymentId: chargeResult.payfastPaymentId,
-          amountCharged: order.deliveryFee,
+          amount: order.deliveryFee,
           driverAmount: split.driverAmount,
           platformAmount: split.platformAmount,
         },
