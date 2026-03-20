@@ -13,11 +13,11 @@ export default async function AdminDashboardPage() {
 
   const [activeOrders, onlineDrivers, todayRevenue, fraudCount] = await Promise.all([
     prisma.order.count({
-      where: { status: { in: ["accepted", "pickup_confirmed", "in_transit"] } },
+      where: { status: { in: ["driver_assigned", "pickup_confirmed", "in_transit"] } },
     }),
     prisma.driver.count({ where: { status: { in: ["available", "busy"] } } }),
     prisma.payment.aggregate({
-      where: { status: "completed", createdAt: { gte: todayStart } },
+      where: { status: "captured", createdAt: { gte: todayStart } },
       _sum: { platformAmount: true },
     }),
     prisma.order.count({ where: { status: "delivered", receiptImageUrl: null } }),

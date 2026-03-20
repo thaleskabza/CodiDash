@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
 
   const payments = await prisma.payment.findMany({
     where: {
-      status: "completed",
+      status: "captured",
       order: dateFilter,
     },
     include: {
@@ -40,9 +40,10 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  const totalAmountCharged = payments.reduce((sum, p) => sum + p.amountCharged, 0);
-  const totalDriverPayouts = payments.reduce((sum, p) => sum + p.driverAmount, 0);
-  const totalPlatformEarnings = payments.reduce((sum, p) => sum + p.platformAmount, 0);
+  type PaymentRow = typeof payments[number];
+  const totalAmountCharged = payments.reduce((sum: number, p: PaymentRow) => sum + p.amount, 0);
+  const totalDriverPayouts = payments.reduce((sum: number, p: PaymentRow) => sum + p.driverAmount, 0);
+  const totalPlatformEarnings = payments.reduce((sum: number, p: PaymentRow) => sum + p.platformAmount, 0);
 
   // Group by date
   const byDate = new Map<string, { count: number; total: number }>();
@@ -51,7 +52,7 @@ export async function GET(req: NextRequest) {
     const existing = byDate.get(dateKey) ?? { count: 0, total: 0 };
     byDate.set(dateKey, {
       count: existing.count + 1,
-      total: existing.total + p.amountCharged,
+      total: existing.total + p.amount,
     });
   }
 

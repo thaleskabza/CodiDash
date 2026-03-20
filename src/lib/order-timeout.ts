@@ -9,7 +9,7 @@ export async function processOrderTimeouts(): Promise<void> {
 
   const timedOutOrders = await prisma.order.findMany({
     where: {
-      status: "pending",
+      status: "pending_driver",
       createdAt: { lt: thirtyMinutesAgo },
     },
     select: { id: true, status: true },
@@ -24,7 +24,7 @@ export async function processOrderTimeouts(): Promise<void> {
       await tx.orderAudit.create({
         data: {
           orderId: order.id,
-          previousStatus: order.status,
+          previousStatus: "pending_driver",
           newStatus: "cancelled",
           actorType: "system",
           metadata: { reason: "driver_timeout", timeoutMinutes: 30 },
@@ -44,7 +44,7 @@ export async function processPickupTimeouts(): Promise<void> {
 
   const staleOrders = await prisma.order.findMany({
     where: {
-      status: "accepted",
+      status: "driver_assigned",
       updatedAt: { lt: ninetyMinutesAgo },
     },
     select: { id: true, status: true, driverId: true },
@@ -63,16 +63,16 @@ export async function processPickupTimeouts(): Promise<void> {
         });
       }
 
-      // Reassign order to pending for re-broadcast
+      // Reassign order to pending_driver for re-broadcast
       await tx.order.update({
         where: { id: order.id },
-        data: { status: "pending", driverId: null },
+        data: { status: "pending_driver", driverId: null },
       });
 
       await tx.orderAudit.create({
         data: {
           orderId: order.id,
-          previousStatus: "accepted",
+          previousStatus: "driver_assigned",
           newStatus: "pending",
           actorType: "system",
           metadata: {

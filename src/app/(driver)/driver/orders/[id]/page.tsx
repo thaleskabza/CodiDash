@@ -20,7 +20,7 @@ export default async function ActiveOrderPage({ params }: Props) {
     where: { id: params.id },
     include: {
       store: true,
-      address: true,
+      deliveryAddress: true,
       items: true,
     },
   });
@@ -35,8 +35,8 @@ export default async function ActiveOrderPage({ params }: Props) {
     storeLongitude: Number(order.store.longitude),
     storeName: order.store.name,
     storeAddress: order.store.address,
-    deliveryAddress: order.address.formattedAddress,
-    items: order.items.map((item) => ({
+    deliveryAddress: order.deliveryAddress.address,
+    items: order.items.map((item: typeof order.items[number]) => ({
       id: item.id,
       smoothieItem: item.smoothieItem,
       voucherCode: item.voucherCode,
