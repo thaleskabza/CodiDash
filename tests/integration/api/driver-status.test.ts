@@ -37,14 +37,15 @@ describe("PATCH /api/admin/drivers/[id]", () => {
     (mockPrisma.driver.update as jest.Mock).mockResolvedValue({
       id: "driver-1",
       status: "available",
+      user: { name: "Test Driver", email: "driver@test.com" },
     });
 
     const res = await PATCH(makeRequest({ status: "available" }), {
-      params: Promise.resolve({ id: "driver-1" }),
+      params: { id: "driver-1" },
     });
     expect(res.status).toBe(200);
     const data = await res.json();
-    expect(data.driver.status).toBe("available");
+    expect(data.status).toBe("available");
   });
 
   it("admin can suspend driver (available → suspended)", async () => {
@@ -56,10 +57,11 @@ describe("PATCH /api/admin/drivers/[id]", () => {
     (mockPrisma.driver.update as jest.Mock).mockResolvedValue({
       id: "driver-1",
       status: "suspended",
+      user: { name: "Test Driver", email: "driver@test.com" },
     });
 
     const res = await PATCH(makeRequest({ status: "suspended" }), {
-      params: Promise.resolve({ id: "driver-1" }),
+      params: { id: "driver-1" },
     });
     expect(res.status).toBe(200);
   });
@@ -68,7 +70,7 @@ describe("PATCH /api/admin/drivers/[id]", () => {
     mockAuth.mockResolvedValue({ user: { id: "customer-1", role: "customer" } });
 
     const res = await PATCH(makeRequest({ status: "available" }), {
-      params: Promise.resolve({ id: "driver-1" }),
+      params: { id: "driver-1" },
     });
     expect(res.status).toBe(403);
   });
@@ -77,7 +79,7 @@ describe("PATCH /api/admin/drivers/[id]", () => {
     mockAuth.mockResolvedValue(null);
 
     const res = await PATCH(makeRequest({ status: "available" }), {
-      params: Promise.resolve({ id: "driver-1" }),
+      params: { id: "driver-1" },
     });
     expect(res.status).toBe(401);
   });
