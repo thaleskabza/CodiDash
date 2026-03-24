@@ -1,5 +1,4 @@
 import { describe, it, expect, jest } from "@jest/globals";
-import crypto from "crypto";
 
 jest.mock("@/lib/payfast", () => ({
   createToken: jest.fn(),
@@ -9,10 +8,12 @@ jest.mock("@/lib/payfast", () => ({
 }));
 
 import { verifyITN, validateSignature } from "@/lib/payfast";
+import type { PayFastITNPayload } from "@/lib/payfast";
+
 const mockVerifyITN = verifyITN as jest.MockedFunction<typeof verifyITN>;
 const mockValidateSignature = validateSignature as jest.MockedFunction<typeof validateSignature>;
 
-function buildITNPayload(overrides: Record<string, string> = {}) {
+function buildITNPayload(overrides: Record<string, string> = {}): PayFastITNPayload {
   return {
     m_payment_id: "pay-123",
     pf_payment_id: "pf-999",
@@ -28,24 +29,24 @@ function buildITNPayload(overrides: Record<string, string> = {}) {
 
 describe("POST /api/payments/webhook — PayFast ITN", () => {
   it("accepts valid ITN with correct signature", async () => {
-    mockVerifyITN.mockResolvedValueOnce(true);
+    mockVerifyITN.mockResolvedValueOnce({ valid: true });
     const payload = buildITNPayload();
-    const valid = await verifyITN(payload);
-    expect(valid).toBe(true);
+    const result = await verifyITN(payload, "", "127.0.0.1");
+    expect(result.valid).toBe(true);
   });
 
   it("rejects ITN with invalid signature", async () => {
-    mockVerifyITN.mockResolvedValueOnce(false);
+    mockVerifyITN.mockResolvedValueOnce({ valid: false, error: "Invalid signature" });
     const payload = buildITNPayload({ signature: "invalid_sig" });
-    const valid = await verifyITN(payload);
-    expect(valid).toBe(false);
+    const result = await verifyITN(payload, "", "127.0.0.1");
+    expect(result.valid).toBe(false);
   });
 
   it("rejects ITN with amount mismatch", async () => {
-    mockVerifyITN.mockResolvedValueOnce(false);
+    mockVerifyITN.mockResolvedValueOnce({ valid: false, error: "Amount mismatch" });
     const payload = buildITNPayload({ amount_gross: "9999.00" });
-    const valid = await verifyITN(payload);
-    expect(valid).toBe(false);
+    const result = await verifyITN(payload, "", "127.0.0.1");
+    expect(result.valid).toBe(false);
   });
 
   it("validates MD5 signature correctly", () => {

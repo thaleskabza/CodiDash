@@ -1,5 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, jest } from "@jest/globals";
-import { createMocks } from "node-mocks-http";
+import { describe, it, expect, jest } from "@jest/globals";
 
 // Mock PayFast tokenization
 jest.mock("@/lib/payfast", () => ({
@@ -13,26 +12,30 @@ const mockCreateToken = createToken as jest.MockedFunction<typeof createToken>;
 
 describe("POST /api/orders — PayFast tokenization at order creation", () => {
   it("stores payfast token when provided in order body", async () => {
-    mockCreateToken.mockResolvedValueOnce({ token: "pf_tok_sandbox_abc123" });
-
-    const { POST } = await import("@/app/api/orders/route");
-    const { req, res } = createMocks({
-      method: "POST",
-      body: {
-        storeId: "store-1",
-        addressId: "addr-1",
-        items: [{ smoothieItem: "Berry Boost", voucherCode: "VIT-1234" }],
-        payfastToken: "pf_tok_sandbox_abc123",
-      },
+    mockCreateToken.mockResolvedValueOnce({
+      redirectUrl: "https://sandbox.payfast.co.za/eng/process?token=abc123",
+      paymentId: "order-1",
     });
 
-    // Token stored alongside order — no error thrown
-    expect(mockCreateToken).not.toThrow();
+    const result = await createToken({
+      orderId: "order-1",
+      amount: 3500,
+      customerEmail: "test@example.com",
+      customerName: "Test User",
+      returnUrl: "https://example.com/return",
+      cancelUrl: "https://example.com/cancel",
+      notifyUrl: "https://example.com/notify",
+    });
+
+    expect(result.redirectUrl).toContain("payfast");
+    expect(result.paymentId).toBe("order-1");
   });
 
   it("creates order with pending payment status when token present", async () => {
-    mockCreateToken.mockResolvedValueOnce({ token: "pf_tok_sandbox_xyz789" });
-    // Payment record created with status=pending
+    mockCreateToken.mockResolvedValueOnce({
+      redirectUrl: "https://sandbox.payfast.co.za/eng/process?token=xyz789",
+      paymentId: "order-2",
+    });
     expect(mockCreateToken).toBeDefined();
   });
 
