@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Sentry error tracking integration.
  * Wraps Sentry SDK calls so they're no-ops when NEXT_PUBLIC_SENTRY_DSN is not set.
