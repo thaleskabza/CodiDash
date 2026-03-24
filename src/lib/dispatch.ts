@@ -32,10 +32,12 @@ export async function dispatchOrder(
   if (!order) throw new Error(`Order ${orderId} not found`);
 
   const store = order.store;
+  console.log(`[dispatch] order ${order.orderNumber} | store: ${store.name} (${store.latitude}, ${store.longitude})`);
 
   const availableDrivers = await prisma.driver.findMany({
     where: { status: "available", latitude: { not: null }, longitude: { not: null } },
   });
+  console.log(`[dispatch] available drivers with location: ${availableDrivers.length}`);
 
   for (const tier of ["ideal", "acceptable"] as const) {
     const radius = TIER_RADIUS[tier];
@@ -47,15 +49,16 @@ export async function dispatchOrder(
         { latitude: Number(store.latitude), longitude: Number(store.longitude) },
         { latitude: Number(driver.latitude), longitude: Number(driver.longitude) },
       );
+      console.log(`[dispatch]   driver ${driver.id} dist=${dist.toFixed(2)}km (radius=${radius}km)`);
       if (dist <= radius) {
         // Use driver.id — this is what DriverDashboardClient subscribes on
         nearbyDriverIds.push(driver.id);
       }
     }
 
+    console.log(`[dispatch] tier=${tier} nearby=${nearbyDriverIds.length}`);
     if (nearbyDriverIds.length === 0) continue;
 
-    const supabase = getSupabaseAdmin();
     const orderPayload = {
       orderId: order.id,
       orderNumber: order.orderNumber,
@@ -69,13 +72,35 @@ export async function dispatchOrder(
       distanceKm: Number(order.distanceKm),
     };
 
-    for (const driverId of nearbyDriverIds) {
-      await supabase.channel(`driver-broadcasts:${driverId}`).send({
-        type: "broadcast",
-        event: "new_order",
-        payload: orderPayload,
-      });
-    }
+    // Broadcast to all nearby drivers in parallel, each with its own client
+    await Promise.all(
+      nearbyDriverIds.map(async (driverId) => {
+        // Fresh client per driver avoids shared-connection limits
+        const client = getSupabaseAdmin();
+        const channel = client.channel(`driver-broadcasts:${driverId}`);
+
+        await new Promise<void>((resolve, reject) => {
+          const timer = setTimeout(
+            () => reject(new Error(`subscribe timeout for driver ${driverId}`)),
+            5_000,
+          );
+          channel.subscribe((status) => {
+            clearTimeout(timer);
+            if (status === "SUBSCRIBED") resolve();
+            else reject(new Error(`channel status ${status} for driver ${driverId}`));
+          });
+        });
+
+        await channel.send({
+          type: "broadcast",
+          event: "new_order",
+          payload: orderPayload,
+        });
+
+        await client.removeChannel(channel);
+        console.log(`[dispatch] ✓ sent to driver ${driverId}`);
+      }),
+    );
 
     return { broadcasted: nearbyDriverIds.length, tier };
   }

@@ -142,8 +142,13 @@ export async function POST(req: NextRequest) {
       data: { qrPayload: JSON.stringify(payload), qrExpiresAt },
     });
 
-    // Fire-and-forget — dispatch to nearby drivers without blocking the response
-    dispatchOrder(order.id).catch(() => {});
+    // Dispatch to nearby drivers — awaited so it completes before response is sent
+    try {
+      const dispatch = await dispatchOrder(order.id);
+      console.log(`[dispatch] order ${order.orderNumber}:`, dispatch);
+    } catch (err) {
+      console.error("[dispatch] failed:", err);
+    }
 
     return NextResponse.json(
       {
