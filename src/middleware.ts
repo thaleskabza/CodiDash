@@ -2,12 +2,14 @@ import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Route prefix to required role mapping
+// Route prefix to required role mapping.
+// Note: /api/orders is intentionally NOT listed here — multiple roles
+// (customer, driver) access different sub-routes, so auth is handled
+// inside each route handler rather than at the middleware level.
 const ROLE_PROTECTED_ROUTES: Record<string, string> = {
   "/customer": "customer",
   "/driver": "driver",
   "/admin": "admin",
-  "/api/orders": "customer",
   "/api/drivers/me": "driver",
   "/api/admin": "admin",
 };
