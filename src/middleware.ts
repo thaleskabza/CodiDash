@@ -15,9 +15,17 @@ const ROLE_PROTECTED_ROUTES: Record<string, string> = {
 // Routes that require authentication but no specific role
 const AUTH_REQUIRED_ROUTES = ["/api/uploads", "/api/addresses"];
 
+// Login pages must remain publicly accessible (reached after sign-out)
+const PUBLIC_PATHS = ["/login", "/register", "/driver/login", "/driver/register"];
+
 export default auth(function middleware(req: NextRequest & { auth: any }) {
   const { pathname } = req.nextUrl;
   const session = req.auth;
+
+  // Allow public paths through without auth checks
+  if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
+    return NextResponse.next();
+  }
 
   // Check role-protected routes
   for (const [prefix, requiredRole] of Object.entries(ROLE_PROTECTED_ROUTES)) {
@@ -70,8 +78,8 @@ export const config = {
      * - _next/image (image optimisation)
      * - favicon.ico
      * - public assets
-     * - auth API routes (handled by NextAuth itself)
+     * - auth API routes (handled by NextAuth itself — must not be intercepted)
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
