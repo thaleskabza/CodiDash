@@ -7,11 +7,10 @@ const PatchSchema = z.object({
   status: z.enum(["available", "suspended", "offline"]),
 });
 
-interface RouteParams {
-  params: { id: string };
-}
+type RouteParams = { params: Promise<{ id: string }> };
 
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (session.user.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -22,11 +21,11 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const driver = await prisma.driver.findUnique({ where: { id: params.id } });
+  const driver = await prisma.driver.findUnique({ where: { id } });
   if (!driver) return NextResponse.json({ error: "Driver not found" }, { status: 404 });
 
   const updated = await prisma.driver.update({
-    where: { id: params.id },
+    where: { id },
     data: { status: parsed.data.status },
     include: { user: { select: { name: true, email: true } } },
   });
