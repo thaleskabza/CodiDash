@@ -8,13 +8,12 @@ const ROLE_PROTECTED_ROUTES: Record<string, string> = {
   "/driver": "driver",
   "/admin": "admin",
   "/api/orders": "customer",
-  "/api/addresses": "customer",
   "/api/drivers/me": "driver",
   "/api/admin": "admin",
 };
 
 // Routes that require authentication but no specific role
-const AUTH_REQUIRED_ROUTES = ["/api/uploads"];
+const AUTH_REQUIRED_ROUTES = ["/api/uploads", "/api/addresses"];
 
 export default auth(function middleware(req: NextRequest & { auth: any }) {
   const { pathname } = req.nextUrl;

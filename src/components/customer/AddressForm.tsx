@@ -136,13 +136,17 @@ export function AddressForm({
           <p className="text-sm text-gray-500 mt-1">Verifying address…</p>
         )}
         {geoResult && !isGeocoding && (
-          <p className="text-sm text-green-600 mt-1">
-            ✓ {geoResult.displayName.slice(0, 80)}…
-            <br />
-            <span className="text-gray-400 text-xs">
+          <button
+            type="button"
+            onClick={() => setAddress(geoResult.displayName)}
+            className="w-full text-left mt-1 px-3 py-2 rounded-md border border-green-300 bg-green-50 hover:bg-green-100 transition-colors"
+          >
+            <span className="text-sm text-green-700 font-medium">✓ Use this address</span>
+            <p className="text-xs text-gray-600 mt-0.5">{geoResult.displayName}</p>
+            <p className="text-gray-400 text-xs">
               {geoResult.latitude.toFixed(5)}, {geoResult.longitude.toFixed(5)}
-            </span>
-          </p>
+            </p>
+          </button>
         )}
         {geoError && <p className="text-sm text-red-500 mt-1">{geoError}</p>}
       </div>

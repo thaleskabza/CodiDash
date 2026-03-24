@@ -88,6 +88,22 @@ async function main() {
   });
   console.log(`Seeded admin user: ${adminEmail}`);
 
+  // ---- 1 test customer ----
+  const customerEmail = "customer@codidash.co.za";
+  const customerPasswordHash = await bcrypt.hash("Customer@CodiDash2024!", 12);
+
+  await prisma.user.upsert({
+    where: { email: customerEmail },
+    update: {},
+    create: {
+      name: "Test Customer",
+      email: customerEmail,
+      passwordHash: customerPasswordHash,
+      role: Role.customer,
+    },
+  });
+  console.log(`Seeded test customer: ${customerEmail}`);
+
   console.log("Seeding complete.");
 }
 

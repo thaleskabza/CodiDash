@@ -39,7 +39,15 @@ export default function CustomerLoginPage() {
         return;
       }
 
-      router.push("/");
+      // Fetch session to determine role-based redirect
+      const sessionRes = await fetch("/api/auth/session");
+      const session = await sessionRes.json();
+      const role = session?.user?.role;
+
+      if (role === "admin") router.push("/admin");
+      else if (role === "driver") router.push("/driver");
+      else router.push("/");
+
       router.refresh();
     } catch {
       setError("An unexpected error occurred. Please try again.");
