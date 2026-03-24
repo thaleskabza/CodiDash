@@ -1,22 +1,31 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function SplashPage() {
   const session = await auth();
 
-  // Redirect authenticated users to their dashboard
   if (session?.user) {
     if (session.user.role === "admin") redirect("/admin");
     if (session.user.role === "driver") redirect("/driver");
-    redirect("/order"); // customer dashboard
+    redirect("/order");
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex flex-col">
       {/* Header */}
       <header className="px-6 py-4 flex justify-between items-center max-w-5xl mx-auto w-full">
-        <span className="text-2xl font-bold text-green-600">CodiDash</span>
+        <div className="flex items-center gap-2">
+          <Image
+            src="/images/codidash-logo.png"
+            alt="CodiDash"
+            width={36}
+            height={36}
+            className="rounded-lg"
+          />
+          <span className="text-2xl font-bold text-green-600">CodiDash</span>
+        </div>
         <div className="flex gap-3">
           <Link
             href="/login"
@@ -34,7 +43,19 @@ export default async function SplashPage() {
       </header>
 
       {/* Hero */}
-      <main className="flex-1 flex flex-col items-center justify-center text-center px-4 py-16">
+      <main className="flex-1 flex flex-col items-center justify-center text-center px-4 py-12">
+        {/* Hero illustration */}
+        <div className="mb-8 rounded-2xl overflow-hidden shadow-lg max-w-2xl w-full">
+          <Image
+            src="/images/hero-rider.jpg"
+            alt="CodiDash delivery rider"
+            width={800}
+            height={450}
+            className="w-full object-cover"
+            priority
+          />
+        </div>
+
         <div className="max-w-2xl">
           <h1 className="text-5xl font-extrabold text-gray-900 leading-tight mb-4">
             Voucher delivery,{" "}
@@ -60,15 +81,32 @@ export default async function SplashPage() {
           </div>
         </div>
 
+        {/* Feature cards with icons */}
+        <div className="mt-16 w-full max-w-3xl">
+          <Image
+            src="/images/codi-dash-icons.png"
+            alt="CodiDash features"
+            width={900}
+            height={200}
+            className="w-full object-contain"
+          />
+        </div>
+
         {/* Feature pills */}
-        <div className="mt-16 flex flex-wrap gap-3 justify-center text-sm text-gray-600">
-          {["🛵 Real-time driver tracking", "📱 QR voucher scanning", "💳 Secure PayFast payments", "📍 Cape Town delivery"].map(
-            (f) => (
-              <span key={f} className="px-4 py-2 bg-white border border-gray-200 rounded-full shadow-sm">
-                {f}
-              </span>
-            ),
-          )}
+        <div className="mt-8 flex flex-wrap gap-3 justify-center text-sm text-gray-600">
+          {[
+            "🛵 Real-time driver tracking",
+            "📱 QR voucher scanning",
+            "💳 Secure PayFast payments",
+            "📍 Cape Town delivery",
+          ].map((f) => (
+            <span
+              key={f}
+              className="px-4 py-2 bg-white border border-gray-200 rounded-full shadow-sm"
+            >
+              {f}
+            </span>
+          ))}
         </div>
       </main>
 

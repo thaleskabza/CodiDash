@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/Card";
@@ -39,9 +40,18 @@ export default async function DriverDashboardPage() {
   return (
     <div className="max-w-xl mx-auto py-8 px-4 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">
-          Hello, {driver.user.name.split(" ")[0]}
-        </h1>
+        <div className="flex items-center gap-3">
+          <Image
+            src="/images/driver-avatar.png"
+            alt="Driver avatar"
+            width={48}
+            height={48}
+            className="rounded-full"
+          />
+          <h1 className="text-2xl font-bold">
+            Hello, {driver.user.name.split(" ")[0]}
+          </h1>
+        </div>
         <span className={`text-sm px-3 py-1 rounded-full font-medium ${statusColor}`}>
           {statusLabel}
         </span>

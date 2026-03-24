@@ -13,7 +13,7 @@ export default async function CustomerLayout({
       {session?.user && (
         <NavBar userName={session.user.name?.split(" ")[0] ?? ""} />
       )}
-      <main>{children}</main>
+      <main className="max-w-4xl mx-auto px-4 py-8">{children}</main>
     </div>
   );
 }
