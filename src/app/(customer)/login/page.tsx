@@ -46,7 +46,7 @@ export default function CustomerLoginPage() {
 
       if (role === "admin") router.push("/admin");
       else if (role === "driver") router.push("/driver");
-      else router.push("/");
+      else router.push("/order");
 
       router.refresh();
     } catch {
