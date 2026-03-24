@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculateDistance, getDeliveryTier } from "@/lib/geo";
 import { generateQR } from "@/lib/qr";
+import { dispatchOrder } from "@/lib/dispatch";
 
 const OrderItemSchema = z
   .object({
@@ -140,6 +141,9 @@ export async function POST(req: NextRequest) {
       where: { id: order.id },
       data: { qrPayload: JSON.stringify(payload), qrExpiresAt },
     });
+
+    // Fire-and-forget — dispatch to nearby drivers without blocking the response
+    dispatchOrder(order.id).catch(() => {});
 
     return NextResponse.json(
       {
