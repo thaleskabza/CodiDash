@@ -137,7 +137,7 @@ export function OrderCreateClient({
 
   if (addresses.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto py-8 px-4">
+      <div>
         <Alert variant="warning">
           You need a saved delivery address before placing an order.{" "}
           <a href="/profile" className="underline font-medium">
@@ -150,7 +150,7 @@ export function OrderCreateClient({
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
+    <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Place Your Order</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
