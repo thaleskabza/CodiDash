@@ -7,7 +7,7 @@ export function SignOutButton() {
   return (
     <Button
       variant="outline"
-      onClick={() => signOut({ callbackUrl: "/driver/login" })}
+      onClick={() => signOut({ callbackUrl: "/" })}
     >
       Sign Out
     </Button>
