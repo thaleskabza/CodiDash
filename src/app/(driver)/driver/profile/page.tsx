@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
 import { SignOutButton } from "./SignOutButton";
 
 const STATUS_CONFIG: Record<

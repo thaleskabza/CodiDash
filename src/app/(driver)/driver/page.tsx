@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/Card";
@@ -72,12 +73,12 @@ export default async function DriverDashboardPage() {
           <p className="text-gray-500 text-sm mb-3">
             You have an active order in progress.
           </p>
-          <a
+          <Link
             href="/driver/orders/active"
             className="text-sm font-medium text-green-600 underline"
           >
             View active order
-          </a>
+          </Link>
         </Card>
       )}
 
