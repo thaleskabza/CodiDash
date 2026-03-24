@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       { latitude: Number(driver.latitude), longitude: Number(driver.longitude) },
     );
     if (dist <= radius) {
-      nearbyDriverIds.push(driver.user.id);
+      nearbyDriverIds.push(driver.id);
     }
   }
 
@@ -60,10 +60,12 @@ export async function POST(req: NextRequest) {
   }
 
   // Broadcast via Supabase Realtime to each driver
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
+  const supabaseKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY &&
+    process.env.SUPABASE_SERVICE_ROLE_KEY !== "FILL_IN_LATER"
+      ? process.env.SUPABASE_SERVICE_ROLE_KEY
+      : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, supabaseKey);
 
   const orderPayload = {
     orderId: order.id,
