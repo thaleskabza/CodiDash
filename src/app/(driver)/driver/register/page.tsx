@@ -126,7 +126,6 @@ export default function DriverRegisterPage() {
             value={form.password}
             onChange={handleChange}
             required
-            helperText="Must be at least 8 characters"
           />
           <Input
             label="Confirm Password"

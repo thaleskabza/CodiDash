@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     platformAmount: Math.round(order.deliveryFee * 0.429),
   };
 
-  await prisma.$transaction(async (tx: typeof prisma) => {
+  await prisma.$transaction(async (tx: any) => {
     // Update or create payment record
     if (order.payment) {
       await tx.payment.update({

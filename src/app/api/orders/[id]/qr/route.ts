@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { generateQR, signPayload, isExpired } from "@/lib/qr";
+import { generateQR, isExpired } from "@/lib/qr";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -23,32 +23,28 @@ export async function GET(_req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
 
-  // If QR is still valid, return it directly
-  if (order.qrPayload && order.qrExpiresAt && !isExpired(order.qrExpiresAt)) {
-    const qrImage = await generateQR(order.qrPayload);
+  // If QR is still valid, return cached payload
+  if (order.qrPayload && order.qrExpiresAt && !isExpired(order.qrExpiresAt.getTime())) {
+    const { qrDataUrl } = await generateQR(order.id);
     return NextResponse.json({
-      qrPayload: qrImage,
+      qrDataUrl,
       qrData: JSON.parse(order.qrPayload),
       expiresAt: order.qrExpiresAt.toISOString(),
     });
   }
 
   // Regenerate expired QR
-  const qrExpiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000);
-  const qrData = { oid: order.orderNumber, ts: Math.floor(Date.now() / 1000) };
-  const sig = signPayload(qrData);
-  const qrPayloadData = { ...qrData, sig };
-  const qrPayloadStr = JSON.stringify(qrPayloadData);
-  const qrImage = await generateQR(qrPayloadStr);
+  const { qrDataUrl, payload, expiresAt } = await generateQR(order.id);
+  const qrPayloadStr = JSON.stringify(payload);
 
   await prisma.order.update({
     where: { id },
-    data: { qrPayload: qrPayloadStr, qrExpiresAt },
+    data: { qrPayload: qrPayloadStr, qrExpiresAt: expiresAt },
   });
 
   return NextResponse.json({
-    qrPayload: qrImage,
-    qrData: qrPayloadData,
-    expiresAt: qrExpiresAt.toISOString(),
+    qrDataUrl,
+    qrData: payload,
+    expiresAt: expiresAt.toISOString(),
   });
 }

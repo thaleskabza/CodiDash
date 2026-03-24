@@ -3,7 +3,7 @@ import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculateDistance, getDeliveryTier } from "@/lib/geo";
-import { generateQR, signPayload } from "@/lib/qr";
+import { generateQR } from "@/lib/qr";
 
 const OrderItemSchema = z
   .object({
@@ -92,15 +92,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate QR payload
-    const qrExpiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
     const orderNumber = generateOrderNumber();
-    const qrData = { oid: orderNumber, ts: Math.floor(Date.now() / 1000) };
-    const sig = signPayload(qrData);
-    const qrPayloadData = { ...qrData, sig };
-    const qrImage = await generateQR(JSON.stringify(qrPayloadData));
 
-    // Create order + items in transaction
+    // Create order + items in transaction (QR generated after, needs real order ID)
     const order = await prisma.$transaction(async (tx) => {
       const newOrder = await tx.order.create({
         data: {
@@ -111,8 +105,6 @@ export async function POST(req: NextRequest) {
           distanceKm,
           deliveryFee: tier.fee,
           status: "pending_driver",
-          qrPayload: JSON.stringify(qrPayloadData),
-          qrExpiresAt,
           paymentToken: paymentToken ?? null,
           items: {
             create: items.map((item) => ({
@@ -142,6 +134,13 @@ export async function POST(req: NextRequest) {
       return newOrder;
     });
 
+    // Generate QR after order creation (needs real order ID)
+    const { qrDataUrl, payload, expiresAt: qrExpiresAt } = await generateQR(order.id);
+    await prisma.order.update({
+      where: { id: order.id },
+      data: { qrPayload: JSON.stringify(payload), qrExpiresAt },
+    });
+
     return NextResponse.json(
       {
         id: order.id,
@@ -156,7 +155,7 @@ export async function POST(req: NextRequest) {
           smoothieItem: i.smoothieItem,
           voucherStatus: i.voucherStatus,
         })),
-        qrPayload: qrImage,
+        qrDataUrl,
         qrExpiresAt: qrExpiresAt.toISOString(),
         createdAt: order.createdAt.toISOString(),
       },

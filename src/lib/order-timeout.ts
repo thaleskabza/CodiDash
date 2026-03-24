@@ -16,7 +16,7 @@ export async function processOrderTimeouts(): Promise<void> {
   });
 
   for (const order of timedOutOrders) {
-    await prisma.$transaction(async (tx: typeof prisma) => {
+    await prisma.$transaction(async (tx: any) => {
       await tx.order.update({
         where: { id: order.id },
         data: { status: "cancelled", cancelledReason: "No driver accepted within 30 minutes" },
@@ -51,7 +51,7 @@ export async function processPickupTimeouts(): Promise<void> {
   });
 
   for (const order of staleOrders) {
-    await prisma.$transaction(async (tx: typeof prisma) => {
+    await prisma.$transaction(async (tx: any) => {
       // Increment driver cancellation count and free them up
       if (order.driverId) {
         await tx.driver.update({

@@ -9,9 +9,10 @@ type Params = { params: Promise<{ id: string }> };
 
 const ScanSchema = z.object({
   qrData: z.object({
-    oid: z.string(),
-    ts: z.number(),
-    sig: z.string(),
+    orderId: z.string(),
+    timestamp: z.number(),
+    nonce: z.string(),
+    signature: z.string(),
   }),
 });
 
@@ -53,18 +54,17 @@ export async function POST(req: NextRequest, { params }: Params) {
   }
 
   // Validate QR expiry
-  if (!order.qrExpiresAt || isExpired(order.qrExpiresAt)) {
+  if (!order.qrExpiresAt || isExpired(order.qrExpiresAt.getTime())) {
     return NextResponse.json({ error: "QR code has expired" }, { status: 400 });
   }
 
   // Validate QR signature
-  const { sig, ...payloadWithoutSig } = qrData;
-  if (!verifySignature(payloadWithoutSig, sig)) {
+  if (!verifySignature(qrData)) {
     return NextResponse.json({ error: "Invalid QR code signature" }, { status: 400 });
   }
 
-  // Verify oid matches order
-  if (qrData.oid !== order.orderNumber) {
+  // Verify orderId matches order
+  if (qrData.orderId !== order.id) {
     return NextResponse.json({ error: "QR code does not match this order" }, { status: 400 });
   }
 
@@ -73,13 +73,14 @@ export async function POST(req: NextRequest, { params }: Params) {
     token: order.paymentToken ?? "",
     amount: order.deliveryFee,
     orderId: order.id,
+    itemName: `CodiDash Delivery - Order ${order.orderNumber}`,
   });
 
   const split = SPLITS[order.deliveryFee] ?? { driver: Math.floor(order.deliveryFee * 0.57), platform: Math.ceil(order.deliveryFee * 0.43) };
 
   if (!chargeResult.success) {
     // Payment failed — move to payment_pending
-    await prisma.$transaction(async (tx: typeof prisma) => {
+    await prisma.$transaction(async (tx: any) => {
       await tx.order.update({ where: { id }, data: { status: "payment_pending" } });
       if (order.payment) {
         await tx.payment.update({
@@ -101,7 +102,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   }
 
   // Success — deliver and record payment
-  const result = await prisma.$transaction(async (tx: typeof prisma) => {
+  const result = await prisma.$transaction(async (tx: any) => {
     const updatedOrder = await tx.order.update({
       where: { id },
       data: { status: "delivered" },
@@ -117,11 +118,11 @@ export async function POST(req: NextRequest, { params }: Params) {
         platformAmount: split.platform,
         status: "captured",
         payfastToken: order.paymentToken,
-        payfastPaymentId: chargeResult.paymentId,
+        payfastPaymentId: chargeResult.payfastPaymentId,
       },
       update: {
         status: "captured",
-        payfastPaymentId: chargeResult.paymentId,
+        payfastPaymentId: chargeResult.payfastPaymentId,
       },
     });
 
@@ -134,7 +135,7 @@ export async function POST(req: NextRequest, { params }: Params) {
         newStatus: "delivered",
         actorId: session.user.id,
         actorType: "driver",
-        metadata: { amountCharged: order.deliveryFee, paymentId: chargeResult.paymentId },
+        metadata: { amountCharged: order.deliveryFee, paymentId: chargeResult.payfastPaymentId },
       },
     });
 

@@ -106,7 +106,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       );
     }
 
-    const updated = await prisma.$transaction(async (tx: typeof prisma) => {
+    const updated = await prisma.$transaction(async (tx: any) => {
       const o = await tx.order.update({
         where: { id },
         data: { status: "pickup_confirmed" },
@@ -137,7 +137,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: "Order is not in pickup_confirmed status" }, { status: 409 });
     }
 
-    const updated = await prisma.$transaction(async (tx: typeof prisma) => {
+    const updated = await prisma.$transaction(async (tx: any) => {
       const o = await tx.order.update({
         where: { id },
         data: { status: "in_transit" },

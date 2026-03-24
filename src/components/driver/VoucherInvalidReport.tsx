@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
-import { Alert } from "@/components/ui/Alert";
 
 interface VoucherInvalidReportProps {
   orderId: string;
@@ -107,7 +106,7 @@ export function VoucherInvalidReport({ orderId, item, onStatusChange }: VoucherI
       </div>
       <Button
         size="sm"
-        variant="destructive"
+        variant="danger"
         onClick={reportInvalid}
         disabled={isReporting}
       >

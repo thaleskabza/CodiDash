@@ -94,7 +94,6 @@ export default function CustomerRegisterPage() {
             onChange={handleChange}
             required
             autoComplete="new-password"
-            helperText="Must be at least 8 characters"
           />
           <Input
             label="Confirm Password"

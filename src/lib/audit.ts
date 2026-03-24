@@ -23,7 +23,7 @@ export async function logOrderAudit(params: AuditParams): Promise<void> {
       newStatus: params.newStatus,
       actorType: params.actorType,
       actorId: params.actorId ?? null,
-      metadata: params.metadata ?? {},
+      metadata: (params.metadata ?? {}) as object,
     },
   });
 }

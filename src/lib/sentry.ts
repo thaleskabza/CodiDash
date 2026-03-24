@@ -9,7 +9,8 @@ let sentryInitialised = false;
 async function getSentry() {
   if (!process.env.NEXT_PUBLIC_SENTRY_DSN) return null;
   try {
-    const Sentry = await import("@sentry/nextjs");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const Sentry = await import("@sentry/nextjs" as string) as any;
     if (!sentryInitialised) {
       Sentry.init({
         dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -30,7 +31,7 @@ export async function captureException(error: unknown, context?: Record<string, 
     console.error("[Error]", error, context);
     return;
   }
-  Sentry.withScope((scope) => {
+  Sentry.withScope((scope: any) => {
     if (context) scope.setExtras(context);
     Sentry.captureException(error);
   });

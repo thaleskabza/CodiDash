@@ -163,7 +163,7 @@ export function ProfileClient({ user, initialAddresses }: ProfileClientProps) {
                   )}
                   <Button
                     size="sm"
-                    variant="destructive"
+                    variant="danger"
                     onClick={() => handleDelete(addr.id)}
                   >
                     Delete

@@ -93,7 +93,7 @@ export function DriverTable({ drivers, onStatusChange }: DriverTableProps) {
                   {driver.status !== "suspended" && driver.status !== "pending_approval" && (
                     <Button
                       size="sm"
-                      variant="destructive"
+                      variant="danger"
                       onClick={() => handleAction(driver.id, "suspended")}
                       disabled={loadingId === driver.id}
                     >

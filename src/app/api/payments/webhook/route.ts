@@ -27,9 +27,9 @@ export async function POST(req: NextRequest) {
   const rawBody = await req.text();
   const params = new URLSearchParams(rawBody);
   const payload: PayFastITNPayload = {} as PayFastITNPayload;
-  for (const [key, value] of params.entries()) {
+  params.forEach((value, key) => {
     payload[key] = value;
-  }
+  });
 
   // 3. Verify ITN
   const { valid, error: itnError } = await verifyITN(payload, rawBody, sourceIp);

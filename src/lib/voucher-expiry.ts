@@ -21,7 +21,7 @@ export async function processExpiredVoucherReplacements(): Promise<void> {
   });
 
   for (const item of expiredItems) {
-    await prisma.$transaction(async (tx: typeof prisma) => {
+    await prisma.$transaction(async (tx: any) => {
       // Cancel the expired item
       await tx.orderItem.update({
         where: { id: item.id },
@@ -30,7 +30,7 @@ export async function processExpiredVoucherReplacements(): Promise<void> {
 
       // Check if any valid items remain in the order
       const remainingValid = item.order.items.filter(
-        (i) =>
+        (i: any) =>
           i.id !== item.id &&
           !["cancelled", "invalid"].includes(i.voucherStatus),
       );
