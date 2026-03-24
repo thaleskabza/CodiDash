@@ -3,11 +3,12 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ActiveOrderClient } from "./ActiveOrderClient";
 
-interface Props {
-  params: { id: string };
-}
-
-export default async function ActiveOrderPage({ params }: Props) {
+export default async function ActiveOrderPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user) redirect("/driver/login");
 
@@ -17,7 +18,7 @@ export default async function ActiveOrderPage({ params }: Props) {
   if (!driver) redirect("/driver/login");
 
   const order = await prisma.order.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       store: true,
       deliveryAddress: true,
