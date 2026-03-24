@@ -6,7 +6,7 @@ import { signOut } from "next-auth/react";
 
 const NAV_ITEMS = [
   { href: "/driver", label: "Dashboard", icon: "🏠" },
-  { href: "/driver/orders", label: "Active Order", icon: "📦" },
+  { href: "/driver/orders", label: "My Orders", icon: "📦" },
   { href: "/driver/earnings", label: "Earnings", icon: "💰" },
 ];
 
