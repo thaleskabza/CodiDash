@@ -11,17 +11,22 @@ interface QRScannerProps {
 }
 
 export function QRScanner({ orderId, onDelivered }: QRScannerProps) {
-  const [mode, setMode] = useState<"idle" | "camera" | "manual">("idle");
+  const [mode, setMode] = useState<"idle" | "camera" | "manual" | "success">("idle");
   const [manualInput, setManualInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [cameraError, setCameraError] = useState("");
+  const [amountCharged, setAmountCharged] = useState<number | null>(null);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
   const scannedRef = useRef(false);
+  // Keep onDelivered fresh so the stale closure in tick() always calls the latest version
+  const onDeliveredRef = useRef(onDelivered);
+  useEffect(() => { onDeliveredRef.current = onDelivered; }, [onDelivered]);
 
   useEffect(() => {
     if (mode === "manual") inputRef.current?.focus();
@@ -38,7 +43,16 @@ export function QRScanner({ orderId, onDelivered }: QRScannerProps) {
     }
   }, []);
 
-  // Start camera when mode switches to "camera"
+  // Auto-redirect after success screen
+  useEffect(() => {
+    if (mode !== "success") return;
+    const timer = setTimeout(() => {
+      window.location.href = "/driver";
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [mode]);
+
+  // Start/stop camera when mode switches
   useEffect(() => {
     if (mode !== "camera") {
       stopCamera();
@@ -106,18 +120,39 @@ export function QRScanner({ orderId, onDelivered }: QRScannerProps) {
       const data = await res.json();
       if (!res.ok) {
         setError(data.message || data.error || "QR scan failed. Please try again.");
-        if (mode === "camera") setMode("idle");
+        setMode("idle");
         return;
       }
-      onDelivered({ amountCharged: data.amountCharged });
+      // Notify parent (best-effort via ref — always fresh)
+      onDeliveredRef.current({ amountCharged: data.amountCharged });
+      setAmountCharged(data.amountCharged ?? null);
+      setMode("success");
     } catch {
       setError("Invalid QR code. Please ask the customer to show their QR code again.");
-      if (mode === "camera") setMode("idle");
+      setMode("idle");
     } finally {
       setIsSubmitting(false);
     }
   }
 
+  // ── Success screen ──────────────────────────────────────────────────────────
+  if (mode === "success") {
+    const rands = amountCharged != null ? (amountCharged / 100).toFixed(2) : null;
+    return (
+      <div className="text-center space-y-3 py-4">
+        <div className="text-4xl">🎉</div>
+        <p className="font-semibold text-green-700">Delivery Complete!</p>
+        {rands && (
+          <p className="text-sm text-gray-600">
+            Payout: <span className="font-bold text-green-700">R{rands}</span>
+          </p>
+        )}
+        <p className="text-xs text-gray-400">Redirecting to dashboard…</p>
+      </div>
+    );
+  }
+
+  // ── Camera screen ───────────────────────────────────────────────────────────
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-600">
@@ -131,13 +166,7 @@ export function QRScanner({ orderId, onDelivered }: QRScannerProps) {
           ) : (
             <div className="relative rounded-lg overflow-hidden bg-black">
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-              <video
-                ref={videoRef}
-                className="w-full"
-                playsInline
-                muted
-              />
-              {/* Hidden canvas used for jsQR frame analysis */}
+              <video ref={videoRef} className="w-full" playsInline muted />
               <canvas ref={canvasRef} className="hidden" />
               {isSubmitting && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50">
