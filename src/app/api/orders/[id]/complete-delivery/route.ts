@@ -68,31 +68,41 @@ export async function POST(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Order must be in out_for_delivery status" }, { status: 409 });
   }
 
-  // Get customer's default payment card token
-  const defaultCard = await prisma.paymentCard.findFirst({
-    where: { userId: order.customerId, isDefault: true },
-  });
-
-  // Fall back to order-level token if no card on file
-  const chargeTokenValue = defaultCard?.token ?? order.paymentToken;
-  if (!chargeTokenValue) {
-    return NextResponse.json({ error: "NO_PAYMENT_TOKEN", message: "No payment token available for this order" }, { status: 402 });
-  }
-
+  const isSandbox = process.env.PAYFAST_SANDBOX === "true";
   const itemName = order.items[0]?.smoothieItem ?? "CodiDash Delivery";
   const earning = driverShare(order.deliveryFee);
   const platformAmount = order.deliveryFee - earning;
 
-  // Attempt payment charge
-  const chargeResult = await chargeToken({
-    token: chargeTokenValue,
-    amount: order.deliveryFee,
-    orderId: order.orderNumber,
-    itemName,
-  });
+  let chargeResult: { success: boolean; payfastPaymentId?: string; error?: string };
+  let chargeTokenValue: string | null = null;
+
+  if (isSandbox) {
+    // In sandbox mode skip real payment — mock a successful charge
+    chargeResult = { success: true, payfastPaymentId: `sandbox-${Date.now()}` };
+    chargeTokenValue = "sandbox-mock";
+  } else {
+    // Get customer's default payment card token
+    const defaultCard = await prisma.paymentCard.findFirst({
+      where: { userId: order.customerId, isDefault: true },
+    });
+
+    // Fall back to order-level token if no card on file
+    chargeTokenValue = defaultCard?.token ?? order.paymentToken;
+    if (!chargeTokenValue) {
+      return NextResponse.json({ error: "NO_PAYMENT_TOKEN", message: "No payment token available for this order" }, { status: 402 });
+    }
+
+    // Attempt payment charge
+    chargeResult = await chargeToken({
+      token: chargeTokenValue,
+      amount: order.deliveryFee,
+      orderId: order.orderNumber,
+      itemName,
+    });
+  }
 
   if (!chargeResult.success) {
-    // Payment failed — leave order in out_for_delivery, write audit
+    // Payment failed — move order to payment_pending, write audit
     await prisma.$transaction(async (tx) => {
       await tx.order.update({ where: { id }, data: { status: "payment_pending" } });
 
@@ -104,7 +114,7 @@ export async function POST(req: NextRequest, { params }: Params) {
           driverAmount: earning,
           platformAmount,
           status: "failed",
-          payfastToken: chargeTokenValue,
+          payfastToken: chargeTokenValue!,
           failureReason: chargeResult.error ?? "Payment charge failed",
         },
         update: {
