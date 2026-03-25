@@ -251,13 +251,12 @@ function CollectCard({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleCollect() {
-    if (!receiptImageUrl.trim()) return;
     setIsSubmitting(true);
     try {
       const res = await fetch(`/api/orders/${orderId}/collect`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ receiptImageUrl }),
+        body: JSON.stringify({ receiptImageUrl: receiptImageUrl || undefined }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -274,19 +273,19 @@ function CollectCard({
     <Card className="p-4 space-y-3">
       <h2 className="text-sm font-semibold">Collect Item from Store</h2>
       <p className="text-xs text-gray-500">
-        Enter the receipt image URL after collecting the item.
+        Optionally enter a receipt reference or image URL.
       </p>
       <input
-        type="url"
+        type="text"
         value={receiptImageUrl}
         onChange={(e) => setReceiptImageUrl(e.target.value)}
-        placeholder="Receipt image URL…"
+        placeholder="Receipt reference (optional)…"
         className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
         disabled={isSubmitting}
       />
       <button
         onClick={handleCollect}
-        disabled={!receiptImageUrl.trim() || isSubmitting}
+        disabled={isSubmitting}
         className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
       >
         {isSubmitting ? "Confirming…" : "Confirm Collection"}

@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 type Params = { params: Promise<{ id: string }> };
 
 const CollectSchema = z.object({
-  receiptImageUrl: z.string().url(),
+  receiptImageUrl: z.string().optional(),
 });
 
 export async function POST(req: NextRequest, { params }: Params) {
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   await prisma.$transaction(async (tx) => {
     await tx.order.update({
       where: { id },
-      data: { status: "collected", receiptImageUrl: parsed.data.receiptImageUrl },
+      data: { status: "collected", receiptImageUrl: parsed.data.receiptImageUrl ?? null },
     });
 
     await tx.orderAudit.create({
