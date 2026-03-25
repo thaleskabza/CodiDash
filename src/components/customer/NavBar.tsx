@@ -26,7 +26,7 @@ export function NavBar({ userName }: NavBarProps) {
           </Link>
           <span className="text-sm text-gray-400">{userName}</span>
           <button
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={async () => { await signOut({ redirect: false }); window.location.href = "/"; }}
             className="text-sm text-red-500 hover:text-red-700 transition-colors font-medium"
           >
             Sign Out

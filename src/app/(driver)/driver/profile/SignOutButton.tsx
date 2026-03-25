@@ -7,7 +7,7 @@ export function SignOutButton() {
   return (
     <Button
       variant="outline"
-      onClick={() => signOut({ callbackUrl: "/" })}
+      onClick={async () => { await signOut({ redirect: false }); window.location.href = "/"; }}
     >
       Sign Out
     </Button>

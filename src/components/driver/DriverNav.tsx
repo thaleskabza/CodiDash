@@ -35,7 +35,7 @@ export function DriverNav() {
 
         <button
           title="Sign out of CodiDash"
-          onClick={() => signOut({ callbackUrl: "/" })}
+          onClick={async () => { await signOut({ redirect: false }); window.location.href = "/"; }}
           className="flex flex-col items-center justify-center text-xs text-red-400 hover:text-red-600 transition-colors"
         >
           <span className="text-xl">🚪</span>

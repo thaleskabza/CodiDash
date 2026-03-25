@@ -66,6 +66,11 @@ export const authConfig: NextAuthConfig = {
     error: "/login",
   },
 
+  // trustHost lets NextAuth derive the base URL from the request host,
+  // so sign-out redirects use the current domain instead of NEXTAUTH_URL.
+  // This prevents localhost redirects in production (Vercel, etc.).
+  trustHost: true,
+
   secret: process.env.NEXTAUTH_SECRET,
 };
 
