@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { broadcastOrderClaimed } from "@/lib/dispatch";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -50,6 +51,11 @@ export async function POST(_req: NextRequest, { params }: Params) {
 
       return o;
     });
+
+    // Fire-and-forget: tell all other drivers this order is taken
+    broadcastOrderClaimed(updated.id, driver.id).catch((e) =>
+      console.error("[dispatch] broadcastOrderClaimed failed:", e),
+    );
 
     return NextResponse.json({ orderId: updated.id, status: updated.status, driverId: updated.driverId });
   } catch (err: unknown) {

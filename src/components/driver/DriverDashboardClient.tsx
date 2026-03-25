@@ -24,6 +24,7 @@ type LocationStatus =
 
 interface DriverDashboardClientProps {
   driverId: string;
+  initialStatus: "available" | "offline";
 }
 
 const LOCATION_INTERVAL_MS = 30_000; // push location every 30 s
@@ -36,7 +37,9 @@ async function pushLocation(lat: number, lng: number) {
   });
 }
 
-export function DriverDashboardClient({ driverId }: DriverDashboardClientProps) {
+export function DriverDashboardClient({ driverId, initialStatus }: DriverDashboardClientProps) {
+  const [driverStatus, setDriverStatus] = useState<"available" | "offline">(initialStatus);
+  const [isTogglingStatus, setIsTogglingStatus] = useState(false);
   const [availableOrders, setAvailableOrders] = useState<OrderBroadcast[]>([]);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -114,6 +117,28 @@ export function DriverDashboardClient({ driverId }: DriverDashboardClientProps) 
     return unsubscribe;
   }, [driverId]);
 
+  const handleToggleStatus = useCallback(async () => {
+    const next = driverStatus === "available" ? "offline" : "available";
+    setIsTogglingStatus(true);
+    setError("");
+    try {
+      const res = await fetch("/api/drivers/me/status", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: next }),
+      });
+      if (res.ok) {
+        setDriverStatus(next);
+        if (next === "offline") setAvailableOrders([]);
+      } else {
+        const data = await res.json();
+        setError(data.error || "Failed to update status.");
+      }
+    } finally {
+      setIsTogglingStatus(false);
+    }
+  }, [driverStatus]);
+
   const handleAccept = useCallback(async (orderId: string) => {
     setAcceptingId(orderId);
     setError("");
@@ -169,6 +194,26 @@ export function DriverDashboardClient({ driverId }: DriverDashboardClientProps) 
 
   return (
     <div className="space-y-4">
+      {/* Online / offline toggle */}
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-700">
+          {driverStatus === "available" ? "You are online" : "You are offline"}
+        </span>
+        <button
+          onClick={handleToggleStatus}
+          disabled={isTogglingStatus}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50 ${
+            driverStatus === "available" ? "bg-green-500" : "bg-gray-300"
+          }`}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+              driverStatus === "available" ? "translate-x-6" : "translate-x-1"
+            }`}
+          />
+        </button>
+      </div>
+
       {/* Location status */}
       <div className="flex items-center justify-between">
         <span
@@ -185,7 +230,11 @@ export function DriverDashboardClient({ driverId }: DriverDashboardClientProps) 
 
       {error && <Alert variant="error">{error}</Alert>}
 
-      {availableOrders.length === 0 ? (
+      {driverStatus === "offline" ? (
+        <p className="text-gray-400 text-sm">
+          You are offline. Toggle the switch above to start receiving orders.
+        </p>
+      ) : availableOrders.length === 0 ? (
         <p className="text-gray-500 text-sm">
           No orders available in your area right now. Make sure you&apos;re
           online and within the delivery zone.

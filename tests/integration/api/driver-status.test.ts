@@ -41,7 +41,7 @@ describe("PATCH /api/admin/drivers/[id]", () => {
     });
 
     const res = await PATCH(makeRequest({ status: "available" }), {
-      params: { id: "driver-1" },
+      params: Promise.resolve({ id: "driver-1" }),
     });
     expect(res.status).toBe(200);
     const data = await res.json();
@@ -61,7 +61,7 @@ describe("PATCH /api/admin/drivers/[id]", () => {
     });
 
     const res = await PATCH(makeRequest({ status: "suspended" }), {
-      params: { id: "driver-1" },
+      params: Promise.resolve({ id: "driver-1" }),
     });
     expect(res.status).toBe(200);
   });
@@ -70,7 +70,7 @@ describe("PATCH /api/admin/drivers/[id]", () => {
     mockAuth.mockResolvedValue({ user: { id: "customer-1", role: "customer" } });
 
     const res = await PATCH(makeRequest({ status: "available" }), {
-      params: { id: "driver-1" },
+      params: Promise.resolve({ id: "driver-1" }),
     });
     expect(res.status).toBe(403);
   });
@@ -79,7 +79,7 @@ describe("PATCH /api/admin/drivers/[id]", () => {
     mockAuth.mockResolvedValue(null);
 
     const res = await PATCH(makeRequest({ status: "available" }), {
-      params: { id: "driver-1" },
+      params: Promise.resolve({ id: "driver-1" }),
     });
     expect(res.status).toBe(401);
   });
