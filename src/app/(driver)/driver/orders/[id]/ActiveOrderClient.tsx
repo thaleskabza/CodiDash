@@ -33,7 +33,7 @@ interface ActiveOrderClientProps {
 }
 
 const STATUS_STEPS = [
-  { key: "accepted", label: "Accepted" },
+  { key: "driver_assigned", label: "Accepted" },
   { key: "pickup_confirmed", label: "Picked Up" },
   { key: "in_transit", label: "In Transit" },
   { key: "delivered", label: "Delivered" },
@@ -141,7 +141,7 @@ export function ActiveOrderClient({ orderId, order: initialOrder }: ActiveOrderC
       </Card>
 
       {/* Voucher items (mark invalid) */}
-      {(status === "accepted" || status === "pickup_confirmed") && (
+      {(status === "driver_assigned" || status === "pickup_confirmed") && (
         <Card className="p-4 space-y-3">
           <h2 className="text-sm font-semibold text-gray-700">Voucher Items</h2>
           {items.map((item) => (
@@ -156,7 +156,7 @@ export function ActiveOrderClient({ orderId, order: initialOrder }: ActiveOrderC
       )}
 
       {/* Step-specific actions */}
-      {status === "accepted" && (
+      {status === "driver_assigned" && (
         <Card className="p-4">
           <h2 className="text-sm font-semibold mb-3">Confirm Pickup</h2>
           <PickupConfirmation
@@ -180,7 +180,7 @@ export function ActiveOrderClient({ orderId, order: initialOrder }: ActiveOrderC
       )}
 
       {/* Cancel order */}
-      {(status === "accepted" || status === "pickup_confirmed") && (
+      {(status === "driver_assigned" || status === "pickup_confirmed") && (
         <CancelOrderButton orderId={orderId} />
       )}
     </div>

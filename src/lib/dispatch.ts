@@ -105,5 +105,49 @@ export async function dispatchOrder(
     return { broadcasted: nearbyDriverIds.length, tier };
   }
 
-  return { broadcasted: 0, tier: "none" };
+  // Last-resort fallback: no drivers within acceptable radius — broadcast to ALL
+  // available drivers so the order is never silently dropped.
+  const allDriverIds = availableDrivers.map((d) => d.id);
+  if (allDriverIds.length === 0) {
+    console.log("[dispatch] no available drivers at all");
+    return { broadcasted: 0, tier: "none" };
+  }
+
+  console.log(`[dispatch] fallback — broadcasting to all ${allDriverIds.length} available driver(s)`);
+
+  const orderPayload = {
+    orderId: order.id,
+    orderNumber: order.orderNumber,
+    storeName: store.name,
+    storeAddress: store.address,
+    items: order.items.map((i) => ({
+      smoothieItem: i.smoothieItem,
+      voucherCode: i.voucherCode,
+    })),
+    deliveryFee: order.deliveryFee,
+    distanceKm: Number(order.distanceKm),
+  };
+
+  await Promise.all(
+    allDriverIds.map(async (driverId) => {
+      const client = getSupabaseAdmin();
+      const channel = client.channel(`driver-broadcasts:${driverId}`);
+      await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(
+          () => reject(new Error(`subscribe timeout for driver ${driverId}`)),
+          5_000,
+        );
+        channel.subscribe((status) => {
+          clearTimeout(timer);
+          if (status === "SUBSCRIBED") resolve();
+          else reject(new Error(`channel status ${status} for driver ${driverId}`));
+        });
+      });
+      await channel.send({ type: "broadcast", event: "new_order", payload: orderPayload });
+      await client.removeChannel(channel);
+      console.log(`[dispatch] ✓ fallback sent to driver ${driverId}`);
+    }),
+  );
+
+  return { broadcasted: allDriverIds.length, tier: "fallback" };
 }
