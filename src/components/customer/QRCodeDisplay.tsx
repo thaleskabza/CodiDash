@@ -94,6 +94,11 @@ export function QRCodeDisplay({
             Loading QR…
           </div>
         )}
+        {qrDataUrl && (
+          <p className="mt-2 text-[10px] text-gray-400 font-mono break-all w-[260px] text-center leading-tight">
+            {qrPayload}
+          </p>
+        )}
       </div>
 
       <div className="text-sm">
