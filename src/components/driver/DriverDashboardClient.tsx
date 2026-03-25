@@ -97,6 +97,18 @@ export function DriverDashboardClient({ driverId, initialStatus }: DriverDashboa
     };
   }, []);
 
+  // ── Load existing pending orders on mount ────────────────────────────────
+  useEffect(() => {
+    fetch("/api/orders/available")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.orders?.length) {
+          setAvailableOrders(data.orders as OrderBroadcast[]);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // ── Realtime order broadcasts ─────────────────────────────────────────────
   useEffect(() => {
     const unsubscribe = subscribeToDriverBroadcasts(

@@ -86,12 +86,18 @@ export default async function DriverDashboardPage() {
           <p className="text-gray-500 text-sm mb-3">
             You have an active order in progress.
           </p>
-          <Link
-            href="/driver/orders/active"
-            className="text-sm font-medium text-green-600 underline"
-          >
-            View active order
-          </Link>
+          {driver.currentOrderId ? (
+            <Link
+              href={`/driver/orders/${driver.currentOrderId}`}
+              className="text-sm font-medium text-green-600 underline"
+            >
+              View active order →
+            </Link>
+          ) : (
+            <p className="text-xs text-gray-400 italic">
+              Order details unavailable. Contact support if this persists.
+            </p>
+          )}
         </Card>
       )}
 
