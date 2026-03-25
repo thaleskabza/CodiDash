@@ -37,6 +37,7 @@ export default async function ActiveOrderPage({
     storeName: order.store.name,
     storeAddress: order.store.address,
     deliveryAddress: order.deliveryAddress.address,
+    itemName: order.items[0]?.smoothieItem ?? null,
     items: order.items.map((item: typeof order.items[number]) => ({
       id: item.id,
       smoothieItem: item.smoothieItem,

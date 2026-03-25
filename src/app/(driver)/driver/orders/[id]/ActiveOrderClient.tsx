@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/Card";
 import { Alert } from "@/components/ui/Alert";
-import { PickupConfirmation } from "@/components/driver/PickupConfirmation";
 import { QRScanner } from "@/components/driver/QRScanner";
 import { VoucherInvalidReport } from "@/components/driver/VoucherInvalidReport";
 import { subscribeToVoucherEvents } from "@/lib/realtime";
@@ -24,6 +23,7 @@ interface OrderData {
   storeName: string;
   storeAddress: string;
   deliveryAddress: string;
+  itemName: string | null;
   items: OrderItem[];
 }
 
@@ -34,8 +34,9 @@ interface ActiveOrderClientProps {
 
 const STATUS_STEPS = [
   { key: "driver_assigned", label: "Accepted" },
-  { key: "pickup_confirmed", label: "Picked Up" },
-  { key: "in_transit", label: "In Transit" },
+  { key: "driver_at_store", label: "At Store" },
+  { key: "collected", label: "Collected" },
+  { key: "out_for_delivery", label: "Out for Delivery" },
   { key: "delivered", label: "Delivered" },
 ];
 
@@ -43,6 +44,7 @@ export function ActiveOrderClient({ orderId, order: initialOrder }: ActiveOrderC
   const [status, setStatus] = useState(initialOrder.status);
   const [items, setItems] = useState<OrderItem[]>(initialOrder.items);
   const [deliveredAmount, setDeliveredAmount] = useState<number | null>(null);
+  const [actionError, setActionError] = useState("");
 
   useEffect(() => {
     const unsub = subscribeToVoucherEvents(orderId, (event) => {
@@ -63,17 +65,29 @@ export function ActiveOrderClient({ orderId, order: initialOrder }: ActiveOrderC
 
   const currentStepIndex = STATUS_STEPS.findIndex((s) => s.key === status);
 
-  function handlePickupConfirmed() {
-    setStatus("pickup_confirmed");
+  async function postLifecycle(endpoint: string, body?: object) {
+    setActionError("");
+    const res = await fetch(`/api/orders/${orderId}/${endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setActionError(data.error || `Failed to update order.`);
+      return null;
+    }
+    return data;
   }
 
-  async function handleStartDelivery() {
-    const res = await fetch(`/api/orders/${orderId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "in_transit" }),
-    });
-    if (res.ok) setStatus("in_transit");
+  async function handleAtStore() {
+    const data = await postLifecycle("at-store");
+    if (data) setStatus("driver_at_store");
+  }
+
+  async function handleOutForDelivery() {
+    const data = await postLifecycle("out-for-delivery");
+    if (data) setStatus("out_for_delivery");
   }
 
   function handleDelivered(result: { amountCharged: number }) {
@@ -140,17 +154,22 @@ export function ActiveOrderClient({ orderId, order: initialOrder }: ActiveOrderC
         ))}
       </div>
 
+      {actionError && <Alert variant="error">{actionError}</Alert>}
+
       {/* Order summary */}
       <Card className="p-4 space-y-1">
         <p className="font-semibold text-sm">{initialOrder.storeName}</p>
         <p className="text-xs text-gray-500">{initialOrder.storeAddress}</p>
+        {initialOrder.itemName && (
+          <p className="text-xs text-gray-700 mt-1">Item: {initialOrder.itemName}</p>
+        )}
         <p className="text-xs text-gray-400 mt-1">
           Delivering to: {initialOrder.deliveryAddress}
         </p>
       </Card>
 
-      {/* Voucher items (mark invalid) */}
-      {(status === "driver_assigned" || status === "pickup_confirmed") && (
+      {/* Voucher items (mark invalid) — only before item is collected */}
+      {(status === "driver_assigned" || status === "driver_at_store") && (
         <Card className="p-4 space-y-3">
           <h2 className="text-sm font-semibold text-gray-700">Voucher Items</h2>
           {items.map((item) => (
@@ -164,35 +183,43 @@ export function ActiveOrderClient({ orderId, order: initialOrder }: ActiveOrderC
         </Card>
       )}
 
-      {/* Step-specific actions */}
+      {/* Step 1 — On the way to store */}
       {status === "driver_assigned" && (
-        <Card className="p-4">
-          <h2 className="text-sm font-semibold mb-3">Confirm Pickup</h2>
-          <PickupConfirmation
-            orderId={orderId}
-            storeLatitude={initialOrder.storeLatitude}
-            storeLongitude={initialOrder.storeLongitude}
-            onConfirmed={handlePickupConfirmed}
-          />
+        <Card className="p-4 space-y-3">
+          <h2 className="text-sm font-semibold">Head to Store</h2>
+          <p className="text-xs text-gray-500">{initialOrder.storeAddress}</p>
+          <button
+            onClick={handleAtStore}
+            className="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+          >
+            I&apos;ve Arrived at Store
+          </button>
         </Card>
       )}
 
-      {status === "pickup_confirmed" && (
+      {/* Step 2 — Collect item from store */}
+      {status === "driver_at_store" && (
+        <CollectCard orderId={orderId} onCollected={() => setStatus("collected")} onError={setActionError} />
+      )}
+
+      {/* Step 3 — Mark out for delivery */}
+      {status === "collected" && (
         <Card className="p-4 space-y-3">
           <h2 className="text-sm font-semibold">Head to Customer</h2>
           <p className="text-xs text-gray-500">
             Deliver to: {initialOrder.deliveryAddress}
           </p>
           <button
-            onClick={handleStartDelivery}
+            onClick={handleOutForDelivery}
             className="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
           >
-            I&apos;m on my way
+            I&apos;m Out for Delivery
           </button>
         </Card>
       )}
 
-      {status === "in_transit" && (
+      {/* Step 4 — Scan QR at customer door */}
+      {status === "out_for_delivery" && (
         <Card className="p-4">
           <h2 className="text-sm font-semibold mb-3">Scan Delivery QR</h2>
           <p className="text-xs text-gray-500 mb-3">
@@ -203,11 +230,68 @@ export function ActiveOrderClient({ orderId, order: initialOrder }: ActiveOrderC
         </Card>
       )}
 
-      {/* Cancel order — only before leaving the store */}
-      {(status === "driver_assigned" || status === "pickup_confirmed") && (
+      {/* Cancel order — only before collection */}
+      {(status === "driver_assigned" || status === "driver_at_store") && (
         <CancelOrderButton orderId={orderId} />
       )}
     </div>
+  );
+}
+
+function CollectCard({
+  orderId,
+  onCollected,
+  onError,
+}: {
+  orderId: string;
+  onCollected: () => void;
+  onError: (msg: string) => void;
+}) {
+  const [receiptImageUrl, setReceiptImageUrl] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleCollect() {
+    if (!receiptImageUrl.trim()) return;
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`/api/orders/${orderId}/collect`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ receiptImageUrl }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        onError(data.error || "Failed to confirm collection.");
+        return;
+      }
+      onCollected();
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <Card className="p-4 space-y-3">
+      <h2 className="text-sm font-semibold">Collect Item from Store</h2>
+      <p className="text-xs text-gray-500">
+        Enter the receipt image URL after collecting the item.
+      </p>
+      <input
+        type="url"
+        value={receiptImageUrl}
+        onChange={(e) => setReceiptImageUrl(e.target.value)}
+        placeholder="Receipt image URL…"
+        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+        disabled={isSubmitting}
+      />
+      <button
+        onClick={handleCollect}
+        disabled={!receiptImageUrl.trim() || isSubmitting}
+        className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+      >
+        {isSubmitting ? "Confirming…" : "Confirm Collection"}
+      </button>
+    </Card>
   );
 }
 

@@ -35,8 +35,8 @@ export async function POST(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Cannot cancel after driver is assigned" }, { status: 409 });
   }
 
-  // Driver can cancel before delivery (not after in_transit → delivered)
-  if (isDriver && !["driver_assigned", "pickup_confirmed"].includes(order.status)) {
+  // Driver can cancel only before collection (driver_assigned or driver_at_store)
+  if (isDriver && !["driver_assigned", "driver_at_store"].includes(order.status)) {
     return NextResponse.json({ error: "Cannot cancel at this order stage" }, { status: 409 });
   }
 
@@ -44,12 +44,13 @@ export async function POST(req: NextRequest, { params }: Params) {
     const previousStatus = order.status;
 
     if (isDriver) {
-      // Increment cancellation count and re-broadcast
+      // Increment cancellation count, clear currentOrderId, and return to available
       await tx.driver.update({
         where: { id: order.driver!.id },
         data: {
           cancellationCount: { increment: 1 },
           status: "available",
+          currentOrderId: null,
         },
       });
       await tx.order.update({

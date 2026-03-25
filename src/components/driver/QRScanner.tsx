@@ -25,14 +25,14 @@ export function QRScanner({ orderId, onDelivered }: QRScannerProps) {
     setIsSubmitting(true);
     try {
       const qrData = JSON.parse(qrDataStr);
-      const res = await fetch(`/api/orders/${orderId}/qr/scan`, {
+      const res = await fetch(`/api/orders/${orderId}/complete-delivery`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ qrData }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "QR scan failed. Please try again.");
+        setError(data.message || data.error || "QR scan failed. Please try again.");
         return;
       }
       onDelivered({ amountCharged: data.amountCharged });

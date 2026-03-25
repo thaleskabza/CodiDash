@@ -9,21 +9,28 @@ type Params = { params: Promise<{ id: string }> };
 const STATUS_LABELS: Record<string, string> = {
   pending_driver: "Pending Driver",
   driver_assigned: "Driver Assigned",
-  pickup_confirmed: "Picked Up",
-  in_transit: "In Transit",
+  driver_at_store: "Driver at Store",
+  collected: "Item Collected",
+  out_for_delivery: "Out for Delivery",
   delivered: "Delivered",
   cancelled: "Cancelled",
   payment_pending: "Payment Pending",
+  // legacy
+  pickup_confirmed: "At Store (legacy)",
+  in_transit: "In Transit (legacy)",
 };
 
 const STATUS_COLORS: Record<string, string> = {
   pending_driver: "bg-yellow-100 text-yellow-800",
   driver_assigned: "bg-blue-100 text-blue-800",
-  pickup_confirmed: "bg-indigo-100 text-indigo-800",
-  in_transit: "bg-purple-100 text-purple-800",
+  driver_at_store: "bg-blue-100 text-blue-800",
+  collected: "bg-indigo-100 text-indigo-800",
+  out_for_delivery: "bg-purple-100 text-purple-800",
   delivered: "bg-green-100 text-green-800",
   cancelled: "bg-red-100 text-red-700",
   payment_pending: "bg-orange-100 text-orange-800",
+  pickup_confirmed: "bg-indigo-100 text-indigo-800",
+  in_transit: "bg-purple-100 text-purple-800",
 };
 
 const PAYMENT_STATUS_COLORS: Record<string, string> = {

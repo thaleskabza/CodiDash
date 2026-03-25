@@ -25,11 +25,21 @@ enum DriverStatus {
 enum OrderStatus {
   pending_driver
   driver_assigned
-  pickup_confirmed
-  in_transit
+  driver_at_store
+  collected
+  out_for_delivery
   delivered
   cancelled
   payment_pending
+  // legacy (retained for backward compat with 001 orders):
+  pickup_confirmed
+  in_transit
+}
+
+enum EarningStatus {
+  accrued
+  payable
+  paid
 }
 
 enum VoucherStatus {
@@ -68,6 +78,7 @@ model User {
   orders            Order[]           @relation("CustomerOrders")
   deliveryAddresses DeliveryAddress[]
   auditLogs         OrderAudit[]
+  paymentCards      PaymentCard[]
 
   @@index([email])
   @@map("users")
@@ -86,8 +97,11 @@ model Driver {
   createdAt         DateTime     @default(now()) @map("created_at")
   updatedAt         DateTime     @updatedAt @map("updated_at")
 
-  user   User    @relation(fields: [userId], references: [id])
-  orders Order[] @relation("DriverOrders")
+  currentOrderId    String?        @map("current_order_id")
+
+  user     User            @relation(fields: [userId], references: [id])
+  orders   Order[]         @relation("DriverOrders")
+  earnings DriverEarning[]
 
   @@index([status])
   @@index([userId])
@@ -151,6 +165,7 @@ model Order {
   deliveryAddress DeliveryAddress @relation(fields: [deliveryAddressId], references: [id])
   items           OrderItem[]
   payment         Payment?
+  driverEarning   DriverEarning?
   auditLogs       OrderAudit[]
 
   @@index([customerId])
@@ -222,4 +237,38 @@ model MenuItem {
   createdAt   DateTime @default(now()) @map("created_at")
 
   @@map("menu_items")
+}
+
+model PaymentCard {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  token       String
+  brand       String?
+  last4       String?  @map("last_4")
+  expiryMonth Int?     @map("expiry_month")
+  expiryYear  Int?     @map("expiry_year")
+  isDefault   Boolean  @default(false) @map("is_default")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("payment_cards")
+}
+
+model DriverEarning {
+  id        String        @id @default(uuid())
+  driverId  String        @map("driver_id")
+  orderId   String        @unique @map("order_id")
+  amount    Int
+  status    EarningStatus @default(accrued)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  driver Driver @relation(fields: [driverId], references: [id])
+  order  Order  @relation(fields: [orderId], references: [id])
+
+  @@index([driverId])
+  @@index([status])
+  @@map("driver_earnings")
 }

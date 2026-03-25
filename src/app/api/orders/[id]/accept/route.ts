@@ -37,7 +37,7 @@ export async function POST(_req: NextRequest, { params }: Params) {
         select: { id: true, status: true, driverId: true },
       });
 
-      await tx.driver.update({ where: { id: driver.id }, data: { status: "busy" } });
+      await tx.driver.update({ where: { id: driver.id }, data: { status: "busy", currentOrderId: id } });
 
       await tx.orderAudit.create({
         data: {

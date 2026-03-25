@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: "⊞" },
   { href: "/admin/orders", label: "Orders", icon: "📋" },
   { href: "/admin/drivers", label: "Drivers", icon: "🚗" },
+  { href: "/admin/earnings", label: "Earnings", icon: "💵" },
   { href: "/admin/revenue", label: "Revenue", icon: "💰" },
   { href: "/admin/fraud", label: "Fraud", icon: "⚠" },
 ];

@@ -8,17 +8,19 @@ import { subscribeToOrder } from "@/lib/realtime";
 
 const STATUS_STEPS = [
   { key: "pending_driver", label: "Finding Driver" },
-  { key: "driver_assigned", label: "Driver Assigned" },
-  { key: "pickup_confirmed", label: "At Store" },
-  { key: "in_transit", label: "On the Way" },
+  { key: "driver_assigned", label: "Driver on the way" },
+  { key: "driver_at_store", label: "Driver at store" },
+  { key: "collected", label: "Item collected" },
+  { key: "out_for_delivery", label: "Out for delivery" },
   { key: "delivered", label: "Delivered" },
 ];
 
 const STATUS_DESCRIPTIONS: Record<string, string> = {
   pending_driver: "We're finding a driver near your pickup store.",
   driver_assigned: "A driver has accepted your order and is heading to the store.",
-  pickup_confirmed: "Your driver is at the store collecting your smoothies.",
-  in_transit: "Your order is on its way! Have your QR code ready.",
+  driver_at_store: "Your driver is at the store collecting your item.",
+  collected: "Item collected — your driver is on the way!",
+  out_for_delivery: "Your order is out for delivery! Have your QR code ready.",
   delivered: "Your order has been delivered. Enjoy your smoothies! 🥤",
   cancelled: "This order has been cancelled.",
   payment_pending: "Payment is pending. Please check your payment method.",
@@ -53,7 +55,7 @@ export function OrderTrackingClient({ order: initialOrder }: { order: OrderData 
   const currentStepIndex = STATUS_STEPS.findIndex((s) => s.key === status);
   const isCancelled = status === "cancelled";
   const isDelivered = status === "delivered";
-  const showQR = ["driver_assigned", "pickup_confirmed", "in_transit"].includes(status);
+  const showQR = status === "out_for_delivery";
 
   return (
     <div className="max-w-xl mx-auto py-8 px-4 space-y-6">
