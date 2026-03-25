@@ -6,9 +6,10 @@ import { Card } from "@/components/ui/Card";
 
 const STATUS_BADGES: Record<string, { label: string; color: string }> = {
   pending_driver: { label: "Finding Driver", color: "bg-yellow-100 text-yellow-700" },
-  driver_assigned: { label: "Driver Assigned", color: "bg-blue-100 text-blue-700" },
-  pickup_confirmed: { label: "At Store", color: "bg-blue-100 text-blue-700" },
-  in_transit: { label: "On the Way", color: "bg-indigo-100 text-indigo-700" },
+  driver_assigned: { label: "Driver on the way", color: "bg-blue-100 text-blue-700" },
+  driver_at_store: { label: "Driver at Store", color: "bg-blue-100 text-blue-700" },
+  collected: { label: "Item Collected", color: "bg-indigo-100 text-indigo-700" },
+  out_for_delivery: { label: "Out for Delivery", color: "bg-indigo-100 text-indigo-700" },
   delivered: { label: "Delivered", color: "bg-green-100 text-green-700" },
   cancelled: { label: "Cancelled", color: "bg-red-100 text-red-600" },
   payment_pending: { label: "Payment Pending", color: "bg-orange-100 text-orange-700" },
@@ -50,7 +51,7 @@ export default async function OrderHistoryPage({
       <div className="flex gap-2 flex-wrap mb-4">
         {[
           { label: "All", value: "" },
-          { label: "Active", value: "in_transit" },
+          { label: "Out for Delivery", value: "out_for_delivery" },
           { label: "Delivered", value: "delivered" },
           { label: "Cancelled", value: "cancelled" },
         ].map((f) => (

@@ -15,7 +15,7 @@ const ROLE_PROTECTED_ROUTES: Record<string, string> = {
 };
 
 // Routes that require authentication but no specific role
-const AUTH_REQUIRED_ROUTES = ["/api/uploads", "/api/addresses"];
+const AUTH_REQUIRED_ROUTES = ["/api/uploads", "/api/addresses", "/api/payments/cards"];
 
 // Login pages must remain publicly accessible (reached after sign-out)
 const PUBLIC_PATHS = ["/login", "/register", "/driver/login", "/driver/register"];

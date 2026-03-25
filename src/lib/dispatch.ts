@@ -64,6 +64,7 @@ export async function dispatchOrder(
       orderNumber: order.orderNumber,
       storeName: store.name,
       storeAddress: store.address,
+      itemName: order.items[0]?.smoothieItem ?? null,
       items: order.items.map((i) => ({
         smoothieItem: i.smoothieItem,
         voucherCode: i.voucherCode,
@@ -120,6 +121,7 @@ export async function dispatchOrder(
     orderNumber: order.orderNumber,
     storeName: store.name,
     storeAddress: store.address,
+    itemName: order.items[0]?.smoothieItem ?? null,
     items: order.items.map((i) => ({
       smoothieItem: i.smoothieItem,
       voucherCode: i.voucherCode,
@@ -182,7 +184,7 @@ export async function broadcastOrderClaimed(
 
       await new Promise<void>((resolve) => {
         const timer = setTimeout(() => resolve(), 4_000); // best-effort — don't reject
-        channel.subscribe((status) => {
+        channel.subscribe((_status) => {
           clearTimeout(timer);
           resolve();
         });

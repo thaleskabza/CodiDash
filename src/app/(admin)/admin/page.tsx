@@ -11,9 +11,9 @@ export default async function AdminDashboardPage() {
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
 
-  const [activeOrders, onlineDrivers, todayRevenue, fraudCount] = await Promise.all([
+  const [activeOrders, onlineDrivers, todayRevenue, fraudCount, failedPayments] = await Promise.all([
     prisma.order.count({
-      where: { status: { in: ["driver_assigned", "pickup_confirmed", "in_transit"] } },
+      where: { status: { in: ["driver_assigned", "driver_at_store", "collected", "out_for_delivery"] } },
     }),
     prisma.driver.count({ where: { status: { in: ["available", "busy"] } } }),
     prisma.payment.aggregate({
@@ -21,6 +21,7 @@ export default async function AdminDashboardPage() {
       _sum: { platformAmount: true },
     }),
     prisma.order.count({ where: { status: "delivered", receiptImageUrl: null } }),
+    prisma.order.count({ where: { status: "payment_pending" } }),
   ]);
 
   const todayEarnings = todayRevenue._sum.platformAmount ?? 0;
@@ -29,6 +30,7 @@ export default async function AdminDashboardPage() {
     { label: "Active Orders", value: String(activeOrders), href: "/admin/orders", color: "text-blue-600" },
     { label: "Online Drivers", value: String(onlineDrivers), href: "/admin/drivers", color: "text-green-600" },
     { label: "Today's Earnings", value: `R${(todayEarnings / 100).toFixed(2)}`, href: "/admin/revenue", color: "text-indigo-600" },
+    { label: "Failed Payments", value: String(failedPayments), href: "/admin/orders?status=payment_pending", color: failedPayments > 0 ? "text-red-600" : "text-gray-600" },
     { label: "Fraud Alerts", value: String(fraudCount), href: "/admin/fraud", color: fraudCount > 0 ? "text-red-600" : "text-gray-600" },
   ];
 
@@ -36,7 +38,7 @@ export default async function AdminDashboardPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {overviewCards.map((card) => (
           <Link key={card.href} href={card.href}>
             <Card className="p-4 hover:shadow-md transition-shadow">

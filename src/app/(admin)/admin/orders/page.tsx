@@ -7,10 +7,11 @@ import { useRouter } from "next/navigation";
 
 const STATUS_OPTIONS = [
   { value: "", label: "All statuses" },
-  { value: "pending", label: "Pending" },
-  { value: "accepted", label: "Accepted" },
-  { value: "pickup_confirmed", label: "Picked Up" },
-  { value: "in_transit", label: "In Transit" },
+  { value: "pending_driver", label: "Pending Driver" },
+  { value: "driver_assigned", label: "Driver Assigned" },
+  { value: "driver_at_store", label: "Driver at Store" },
+  { value: "collected", label: "Collected" },
+  { value: "out_for_delivery", label: "Out for Delivery" },
   { value: "delivered", label: "Delivered" },
   { value: "cancelled", label: "Cancelled" },
   { value: "payment_pending", label: "Payment Pending" },
