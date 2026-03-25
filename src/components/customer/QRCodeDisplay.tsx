@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import QRCode from "qrcode";
 import { Button } from "@/components/ui/Button";
 
 interface QRCodeDisplayProps {
   orderId: string;
-  initialQrPayload: string;
+  initialQrPayload: string;   // the signed JSON string stored in DB
   initialExpiresAt: string;
 }
 
@@ -24,16 +25,33 @@ function formatCountdown(ms: number): string {
   return `${s}s`;
 }
 
+async function payloadToDataUrl(payload: string): Promise<string> {
+  return QRCode.toDataURL(payload, {
+    errorCorrectionLevel: "M",
+    type: "image/png",
+    margin: 2,
+    width: 260,
+    color: { dark: "#000000", light: "#FFFFFF" },
+  });
+}
+
 export function QRCodeDisplay({
   orderId,
   initialQrPayload,
   initialExpiresAt,
 }: QRCodeDisplayProps) {
   const [qrPayload, setQrPayload] = useState(initialQrPayload);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState(initialExpiresAt);
   const [countdown, setCountdown] = useState(formatCountdown(msUntil(initialExpiresAt)));
   const [isRegenerating, setIsRegenerating] = useState(false);
 
+  // Generate PNG whenever the payload changes
+  useEffect(() => {
+    payloadToDataUrl(qrPayload).then(setQrDataUrl).catch(() => setQrDataUrl(null));
+  }, [qrPayload]);
+
+  // Countdown ticker
   useEffect(() => {
     const timer = setInterval(() => {
       setCountdown(formatCountdown(msUntil(expiresAt)));
@@ -47,7 +65,11 @@ export function QRCodeDisplay({
       const res = await fetch(`/api/orders/${orderId}/qr`);
       if (res.ok) {
         const data = await res.json();
-        setQrPayload(data.qrPayload);
+        // API returns the signed payload as qrData (object) — stringify it for display
+        const newPayload = typeof data.qrData === "string"
+          ? data.qrData
+          : JSON.stringify(data.qrData);
+        setQrPayload(newPayload);
         setExpiresAt(data.expiresAt);
       }
     } finally {
@@ -64,14 +86,14 @@ export function QRCodeDisplay({
       </p>
 
       <div className={`inline-block p-2 border-2 rounded-lg ${expired ? "opacity-40 border-red-300" : "border-green-400"}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={qrPayload}
-          alt="Delivery QR Code"
-          width={200}
-          height={200}
-          className="block"
-        />
+        {qrDataUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={qrDataUrl} alt="Delivery QR Code" width={260} height={260} className="block" />
+        ) : (
+          <div className="w-[260px] h-[260px] flex items-center justify-center bg-gray-50 text-gray-400 text-sm">
+            Loading QR…
+          </div>
+        )}
       </div>
 
       <div className="text-sm">
