@@ -99,7 +99,7 @@ export function ProfileClient({ user, initialAddresses }: ProfileClientProps) {
         <Button
           variant="outline"
           className="mt-4"
-          onClick={() => signOut({ callbackUrl: "/login" })}
+          onClick={async () => { await signOut({ redirect: false }); window.location.href = "/"; }}
         >
           Sign Out
         </Button>

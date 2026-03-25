@@ -55,7 +55,7 @@ export function AdminSidebar({ email, name }: AdminSidebarProps) {
           <p className="text-xs text-gray-400 truncate">{email}</p>
         </div>
         <button
-          onClick={() => signOut({ callbackUrl: "/" })}
+          onClick={async () => { await signOut({ redirect: false }); window.location.href = "/"; }}
           className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
         >
           <span>→</span>
