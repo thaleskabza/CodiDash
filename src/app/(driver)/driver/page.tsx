@@ -73,7 +73,10 @@ export default async function DriverDashboardPage() {
       {(driver.status === "available" || driver.status === "offline") && (
         <Card className="p-6">
           <h2 className="text-lg font-semibold mb-4">Available Orders</h2>
-          <DriverDashboardClient driverId={driver.id} />
+          <DriverDashboardClient
+            driverId={driver.id}
+            initialStatus={driver.status === "available" ? "available" : "offline"}
+          />
         </Card>
       )}
 

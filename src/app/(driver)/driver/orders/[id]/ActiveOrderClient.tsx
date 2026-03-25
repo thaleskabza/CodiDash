@@ -67,6 +67,15 @@ export function ActiveOrderClient({ orderId, order: initialOrder }: ActiveOrderC
     setStatus("pickup_confirmed");
   }
 
+  async function handleStartDelivery() {
+    const res = await fetch(`/api/orders/${orderId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "in_transit" }),
+    });
+    if (res.ok) setStatus("in_transit");
+  }
+
   function handleDelivered(result: { amountCharged: number }) {
     setStatus("delivered");
     setDeliveredAmount(result.amountCharged);
@@ -169,17 +178,32 @@ export function ActiveOrderClient({ orderId, order: initialOrder }: ActiveOrderC
       )}
 
       {status === "pickup_confirmed" && (
+        <Card className="p-4 space-y-3">
+          <h2 className="text-sm font-semibold">Head to Customer</h2>
+          <p className="text-xs text-gray-500">
+            Deliver to: {initialOrder.deliveryAddress}
+          </p>
+          <button
+            onClick={handleStartDelivery}
+            className="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+          >
+            I&apos;m on my way
+          </button>
+        </Card>
+      )}
+
+      {status === "in_transit" && (
         <Card className="p-4">
           <h2 className="text-sm font-semibold mb-3">Scan Delivery QR</h2>
           <p className="text-xs text-gray-500 mb-3">
-            Drive to {initialOrder.deliveryAddress} and scan the customer&apos;s QR code to
+            Arrive at {initialOrder.deliveryAddress} and scan the customer&apos;s QR code to
             complete delivery.
           </p>
           <QRScanner orderId={orderId} onDelivered={handleDelivered} />
         </Card>
       )}
 
-      {/* Cancel order */}
+      {/* Cancel order — only before leaving the store */}
       {(status === "driver_assigned" || status === "pickup_confirmed") && (
         <CancelOrderButton orderId={orderId} />
       )}

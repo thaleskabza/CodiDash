@@ -151,3 +151,52 @@ export async function dispatchOrder(
 
   return { broadcasted: allDriverIds.length, tier: "fallback" };
 }
+
+/**
+ * Broadcast to all drivers who received a specific order that it has been claimed.
+ * Called after a driver successfully accepts an order, so other drivers remove it from their UI.
+ */
+export async function broadcastOrderClaimed(
+  orderId: string,
+  claimingDriverId: string,
+): Promise<void> {
+  // Find all available drivers (they may still have the order in their UI)
+  // plus any driver who was nearby — we broadcast to everyone with a location.
+  const drivers = await prisma.driver.findMany({
+    where: {
+      latitude: { not: null },
+      longitude: { not: null },
+      id: { not: claimingDriverId },
+    },
+    select: { id: true },
+  });
+
+  if (drivers.length === 0) return;
+
+  const payload = { orderId };
+
+  await Promise.all(
+    drivers.map(async (driver) => {
+      const client = getSupabaseAdmin();
+      const channel = client.channel(`driver-broadcasts:${driver.id}`);
+
+      await new Promise<void>((resolve) => {
+        const timer = setTimeout(() => resolve(), 4_000); // best-effort — don't reject
+        channel.subscribe((status) => {
+          clearTimeout(timer);
+          resolve();
+        });
+      });
+
+      await channel.send({
+        type: "broadcast",
+        event: "order_claimed",
+        payload,
+      });
+
+      await client.removeChannel(channel);
+    }),
+  );
+
+  console.log(`[dispatch] order_claimed broadcast sent to ${drivers.length} driver(s)`);
+}
