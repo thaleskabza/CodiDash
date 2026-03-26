@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { generateQR, isExpired } from "@/lib/qr";
+import { generateQR } from "@/lib/qr";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -24,12 +24,15 @@ export async function GET(_req: NextRequest, { params }: Params) {
   }
 
   // If QR is still valid, return cached payload
-  if (order.qrPayload && order.qrExpiresAt && !isExpired(order.qrExpiresAt.getTime())) {
-    const { qrDataUrl } = await generateQR(order.id);
+  const qrStillValid =
+    order.qrPayload &&
+    order.qrExpiresAt &&
+    order.qrExpiresAt.getTime() > Date.now();
+
+  if (qrStillValid) {
     return NextResponse.json({
-      qrDataUrl,
-      qrData: JSON.parse(order.qrPayload),
-      expiresAt: order.qrExpiresAt.toISOString(),
+      qrData: JSON.parse(order.qrPayload!),
+      expiresAt: order.qrExpiresAt!.toISOString(),
     });
   }
 
