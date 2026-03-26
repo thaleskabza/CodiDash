@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import QRCode from "qrcode";
 import { Button } from "@/components/ui/Button";
 
 interface VoucherInvalidReportProps {
@@ -29,6 +30,19 @@ export function VoucherInvalidReport({ orderId, item, onStatusChange }: VoucherI
   const [isReporting, setIsReporting] = useState(false);
   const [countdown, setCountdown] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [voucherQrUrl, setVoucherQrUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!item.voucherCode) return;
+    QRCode.toDataURL(item.voucherCode, {
+      errorCorrectionLevel: "M",
+      width: 200,
+      margin: 2,
+      color: { dark: "#000000", light: "#FFFFFF" },
+    })
+      .then(setVoucherQrUrl)
+      .catch(() => setVoucherQrUrl(null));
+  }, [item.voucherCode]);
 
   useEffect(() => {
     if (!item.replacementDeadline) return;
@@ -97,22 +111,31 @@ export function VoucherInvalidReport({ orderId, item, onStatusChange }: VoucherI
   }
 
   return (
-    <div className="flex items-center justify-between p-3 border rounded-lg">
-      <div>
-        <p className="text-sm font-medium">{item.smoothieItem}</p>
-        {item.voucherCode && (
-          <p className="text-xs text-gray-500">Code: {item.voucherCode}</p>
-        )}
+    <div className="p-3 border rounded-lg space-y-3">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium">{item.smoothieItem}</p>
+          {item.voucherCode && (
+            <p className="text-xs text-gray-500 font-mono">{item.voucherCode}</p>
+          )}
+        </div>
+        <Button
+          size="sm"
+          variant="danger"
+          onClick={reportInvalid}
+          disabled={isReporting}
+        >
+          {isReporting ? "Reporting…" : "Mark Invalid"}
+        </Button>
       </div>
-      <Button
-        size="sm"
-        variant="danger"
-        onClick={reportInvalid}
-        disabled={isReporting}
-      >
-        {isReporting ? "Reporting…" : "Mark Invalid"}
-      </Button>
-      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+      {voucherQrUrl && (
+        <div className="flex flex-col items-center gap-1">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={voucherQrUrl} alt="Voucher QR Code" width={200} height={200} className="block" />
+          <p className="text-[10px] text-gray-400">Show this QR at the store</p>
+        </div>
+      )}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }
